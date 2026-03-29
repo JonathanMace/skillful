@@ -31,6 +31,15 @@ When spawning subagents (via the `task` tool or any other delegation mechanism),
 - This rule applies recursively — include it in subagent prompts so they also specify models when spawning their own subagents.
 - The user can override this by choosing a specific model or by explicitly requesting the system default (i.e., no model specified).
 
+## Default Execution Strategy
+
+The user often gives commands concurrently. By default, **delegate each top-level request to a background subagent** (via the `task` tool with `mode: "background"`). This keeps the main session responsive and allows parallel work.
+
+- Spawn a subagent for each independent request immediately — don't wait for one to finish before starting another.
+- Only handle a request inline (without a subagent) when it is trivially small (e.g., a single quick edit, a short answer) or when the user explicitly asks you to do it yourself.
+- When multiple requests arrive in the same message, launch all subagents in parallel.
+- Report back to the user as subagents complete.
+
 ## Skill Discovery
 
 Before starting any task, check whether a relevant skill is available. Use `/skills list` or rely on auto-invocation to find skills that match the current task. Skills provide curated, task-specific guidance that produces better results than working from general knowledge alone.
