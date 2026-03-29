@@ -1,10 +1,10 @@
 ---
 name: writing-custom-instructions
 description: >-
-  Guide for authoring always-on instruction files that steer GitHub Copilot
-  CLI with repository, path, agent, or local guidance.  Use when asked to
-  author custom instructions, configure copilot-instructions, set up repo
-  instructions, or author AGENTS.md.
+  Instructions are always included with every agent session.  If you need
+  to enforce rules or persistent guidance on Copilot agents and sessions,
+  use this skill.  Use when asked to author custom instructions, configure
+  copilot-instructions, set up repo instructions, or create AGENTS.md.
 license: MIT
 ---
 
