@@ -235,6 +235,92 @@ copilot --agent=test-specialist --prompt "Review test coverage"
 
 When `disable-model-invocation` is `false` (the default), Copilot may automatically delegate tasks to the agent when the task matches the agent's `description`. This is why the description field is critical — it controls when auto-delegation triggers.
 
+## Embedded Subagent Instructions
+
+### The Problem
+
+Agent discovery is flat — only `.agent.md` files directly in `.github/agents/` are registered. Every agent file in that directory appears in the `/agent` list and is eligible for auto-delegation. When an agent needs to orchestrate specialist subagents (e.g., a code reviewer that dispatches security, logic, and style checks in parallel), placing each subagent as its own `.agent.md` pollutes the agent list with internal implementation details that users should never invoke directly. The `user-invocable: false` property still requires the file in `.github/agents/` and still registers it — it doesn't solve the discoverability problem.
+
+### The Solution: Instruction Files Referenced via the `task` Tool
+
+Keep subagent instructions as plain Markdown files in a **subdirectory** — not as `.agent.md` files in `.github/agents/`. Because subdirectories are not scanned for agents, these files are invisible to `/agent` listing and auto-delegation. The parent agent spawns subagents via the `task` tool, passing a prompt that tells the subagent to read and follow a specific instruction file.
+
+This is the agent-side analog of the dispatcher pattern for skills (see the `writing-skills` skill's "Scaling Skills: The Dispatcher Pattern" section). Where a dispatcher skill routes to deep content files that the **same** agent reads, a parent agent routes to instruction files that **separate subagents** read — enabling parallel execution and model selection per subagent.
+
+```
+.github/agents/
+├── code-reviewer.agent.md          # Parent agent: dispatches to subagents
+└── code-reviewer/                  # Subdirectory: NOT discovered as agents
+    └── reviewers/
+        ├── security.md             # Subagent instructions: security review
+        ├── logic.md                # Subagent instructions: logic review
+        └── style.md                # Subagent instructions: style review
+```
+
+### Placement Options
+
+| Placement | Path | Best when |
+|-----------|------|-----------|
+| **Co-located with parent** | `.github/agents/<parent-name>/` | Instructions are tightly coupled to one parent agent |
+| **Inside a skill directory** | `.github/skills/<skill>/subagents/` | A skill needs to spawn subagents as part of its procedure |
+| **Dedicated directory** | `.github/subagents/` | Multiple parents share the same instruction files |
+
+### Parent Agent Example
+
+```markdown
+---
+name: code-reviewer
+description: >-
+  Reviews code changes for security vulnerabilities, logic errors, and style
+  issues by dispatching parallel specialist reviewers.  Use when asked to
+  review a PR, audit code quality, or check for bugs.
+tools: ["read", "search", "agent"]
+---
+
+You are a code review orchestrator. When asked to review code:
+
+1. Identify the code to review (diff, file, or snippet).
+2. Spawn three parallel subagents using the `task` tool, each with
+   `agent_type: "general-purpose"`:
+   - **Security** — prompt: "Read and follow the instructions in
+     `.github/agents/code-reviewer/reviewers/security.md`. Then perform
+     a security review of this code: ..."
+   - **Logic** — prompt: "Read and follow the instructions in
+     `.github/agents/code-reviewer/reviewers/logic.md`. Then perform
+     a logic review of this code: ..."
+   - **Style** — prompt: "Read and follow the instructions in
+     `.github/agents/code-reviewer/reviewers/style.md`. Then perform
+     a style review of this code: ..."
+3. Collect the results from all three subagents.
+4. Synthesize a unified review with sections for each category.
+
+Choose the model for each subagent based on the task:
+- Security reviews benefit from stronger reasoning (`claude-opus-4.6`)
+- Logic and style reviews work well with fast models (`gpt-5.4`)
+```
+
+### When to Use Embedded Subagent Instructions
+
+- A parent agent orchestrates **parallel specialist tasks** that benefit from separate context windows (e.g., reviewing code from multiple angles simultaneously).
+- You need **different models** for different subtasks (e.g., a stronger model for security analysis, a faster model for style checks).
+- Subagent logic is complex enough to warrant its own instruction file (~50+ lines) but should not be user-visible as a standalone agent.
+- Multiple parent agents need to **share the same subagent instructions** — put them in a common location and reference from each parent.
+
+### When NOT to Use It
+
+- The parent agent can handle all subtasks itself in a single pass. Don't over-engineer a sequential checklist into parallel subagents.
+- The subtask is simple enough to express inline in the parent's `task` tool prompt. Only extract to a file when the instructions are substantial.
+- The subagent needs its own frontmatter properties (model, tools, MCP servers). In that case, it must be a real `.agent.md` file — use `disable-model-invocation: true` and `user-invocable: false` to minimize noise.
+
+### Guidelines for Writing Subagent Instruction Files
+
+1. **Structure like a SKILL.md body** — include a role statement, procedure, rules, and done criteria. They just lack frontmatter since they are not discovered as agents or skills.
+2. **Be self-contained** — a subagent starts with no context beyond what the parent provides in the prompt. The instruction file should include everything the subagent needs to know to do its job.
+3. **Define scope boundaries** — explicitly state what the subagent should and should NOT comment on. This prevents overlap when multiple subagents review the same code.
+4. **Include output format requirements** — tell the subagent how to structure its response so the parent can synthesize results consistently.
+5. **Keep files focused** — one instruction file per specialty. If a file grows beyond ~150 lines, consider splitting it further.
+6. **Cross-reference freely** — instruction files can tell the subagent to read additional files (templates, rule lists, project configs) as needed.
+
 ## Best Practices for Authoring Agents
 
 1. **Author a clear description** — this is how Copilot decides when to delegate. Include the domain and trigger keywords.
@@ -244,3 +330,4 @@ When `disable-model-invocation` is `false` (the default), Copilot may automatica
 5. **Use `disable-model-invocation: true`** for agents that should only be invoked explicitly (e.g., destructive operations).
 6. **Test the agent** — invoke it with `/agent` and verify it behaves as expected before sharing.
 7. **Version with your code** — agent profiles in `.github/agents/` are version-controlled and can be branched.
+8. **Use embedded subagent instructions for orchestration** — when an agent dispatches parallel specialist tasks, keep subagent instruction files in a subdirectory rather than registering each as its own `.agent.md`. This keeps the agent list clean and scopes subagent logic to the parent that owns it.
