@@ -1,9 +1,9 @@
 ---
 name: writing-hooks
 description: >-
-  Author JSON hook configuration files that run custom commands at key Copilot
-  CLI lifecycle events. Use this skill to author hook configuration files,
-  add pre/post tool hooks, or set up .github/hooks.
+  Hooks run custom commands automatically at key points in the agent lifecycle.
+  Use this skill to author hooks.json files, add pre/post tool guards, or
+  set up .github/hooks.
 license: MIT
 ---
 
