@@ -277,5 +277,6 @@ Use the /github-actions-failure-debugging skill to fix the CI failures.
 8. **Keep instructions actionable** — author numbered steps, not vague aspirations. Tell Copilot what to do, what to check, and when to use supporting files.
 9. **Match existing conventions** — if the repository already has skills, match their tone, frontmatter shape, and structural patterns.
 10. **Reference scripts for complex logic** — if a procedure involves complex shell commands or multi-step automation, include a script in the skill directory rather than embedding long code blocks in the Markdown.
-11. **Use the dispatcher pattern for broad domains** — when a skill covers multiple sub-tasks or would exceed ~200 lines, keep the SKILL.md thin and route to deeper content files. This keeps description overhead low and avoids context bloat.
-12. **Consider packaging as a plugin** — if you want to distribute a collection of skills (plus agents, hooks, and MCP configs), package them as a plugin for easy installation via `/plugin install`.
+11. **Open with an "Inspect First" step** — start your procedure by listing the specific files, configs, or state the agent should read before making any changes. This grounds the agent in current reality and prevents stale-context mistakes or assumptions that drift from what's actually in the repo.
+12. **Use the dispatcher pattern for broad domains** — when a skill covers multiple sub-tasks or would exceed ~200 lines, keep the SKILL.md thin and route to deeper content files. This keeps description overhead low and avoids context bloat.
+13. **Consider packaging as a plugin** — if you want to distribute a collection of skills (plus agents, hooks, and MCP configs), package them as a plugin for easy installation via `/plugin install`.
