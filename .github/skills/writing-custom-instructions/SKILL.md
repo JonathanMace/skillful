@@ -4,8 +4,7 @@ description: >-
   Instructions are always included with every agent session.  If you need
   to enforce rules, behavioral expectations, or persistent guidance across
   all Copilot sessions, use this skill.  Use when asked to author custom
-  instructions, configure copilot-instructions, set up repo instructions,
-  or create AGENTS.md.
+  instructions, configure copilot-instructions, or set up repo instructions.
 license: MIT
 ---
 
@@ -15,8 +14,8 @@ Custom instructions are persistent natural-language guidance that Copilot CLI au
 
 ## Procedure: Authoring Custom Instructions
 
-1. **Decide the instruction scope** — does this guidance belong in repository-wide instructions, path-specific instructions, agent instructions (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`), or local instructions?
-2. **Inspect existing instructions** — check for `.github/copilot-instructions.md`, `.github/instructions/`, `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md` so you can avoid contradictions and extend the right file.
+1. **Decide the instruction scope** — does this guidance belong in repository-wide instructions, path-specific instructions, or local instructions?
+2. **Inspect existing instructions** — check for `.github/copilot-instructions.md` and `.github/instructions/` so you can avoid contradictions and extend the right file.
 3. **Choose the right file type** (see [Instruction Types](#instruction-types) below).
 4. **Author the file** — use short, self-contained statements in Markdown. For path-specific files, add the required `applyTo` frontmatter.
 5. **Prioritize critical rules first** — Copilot code review only reads the first 4,000 characters of instruction files.
@@ -30,7 +29,6 @@ Custom instructions are persistent natural-language guidance that Copilot CLI au
 |------|--------------|-------|
 | **Repository-wide** | `.github/copilot-instructions.md` | All tasks in this repo |
 | **Path-specific** | `.github/instructions/**/*.instructions.md` | Tasks involving files matching a glob pattern |
-| **Agent instructions** | `AGENTS.md` in the git root or cwd; `CLAUDE.md` / `GEMINI.md` at repo root | Agent-powered work in this repo |
 | **Local/personal** | `$HOME/.copilot/copilot-instructions.md` | All repos for this user |
 | **Additional instruction dirs** | Directories listed in `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` | Extra locations for the same instruction file types |
 
@@ -38,8 +36,7 @@ Custom instructions are persistent natural-language guidance that Copilot CLI au
 
 1. Path-specific instructions (`.github/instructions/**/*.instructions.md`)
 2. Repository-wide instructions (`.github/copilot-instructions.md`)
-3. Agent instructions (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`)
-4. Local/personal instructions
+3. Local/personal instructions
 
 All matching instructions are combined and provided to Copilot. Avoid conflicts between levels — conflicting instructions produce non-deterministic behavior.
 
@@ -134,36 +131,6 @@ Valid values: `"code-review"`, `"coding-agent"`.
 ```
 
 Name files descriptively. Use subdirectories to organize by domain.
-
-## Agent Instructions (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`)
-
-### Location: `AGENTS.md` in the git root or cwd; `CLAUDE.md` / `GEMINI.md` at repo root
-
-Use `AGENTS.md` as the default agent-instruction file for Copilot CLI. Copilot CLI also reads `CLAUDE.md` and `GEMINI.md` at the repository root for compatibility with those conventions.
-
-```markdown
-# AGENTS.md
-
-## Development Workflow
-
-- Always create a feature branch; never commit directly to main
-- Run `npm test` before committing
-- Include a changelog entry for user-facing changes
-
-## Code Review Standards
-
-- All PRs require at least one approval
-- Check for security implications in dependency updates
-```
-
-### When to Use AGENTS.md vs copilot-instructions.md
-
-Both are loaded by Copilot CLI for every request, but:
-
-- **`copilot-instructions.md`** is the Copilot-native format — use it as the default choice.
-- **`AGENTS.md`** is also loaded by Copilot CLI and gives you a dedicated place for agent-oriented workflow rules. Use it when you want to keep those rules separate from general repository conventions.
-- **`CLAUDE.md` / `GEMINI.md`** should usually be treated as compatibility inputs Copilot CLI can read, not as the first file you author for a Copilot-CLI-only repository.
-- If both exist, both are used. Avoid contradictions between them.
 
 ## Local Instructions
 
