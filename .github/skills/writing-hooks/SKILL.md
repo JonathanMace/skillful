@@ -1,9 +1,10 @@
 ---
 name: writing-hooks
 description: >-
-  Guide for authoring Copilot CLI hooks (hooks.json lifecycle event handlers).
-  Use when asked to author hooks, create lifecycle hooks, configure
-  session hooks, add pre/post tool hooks, or set up .github/hooks.
+  Hooks let you run custom commands automatically at key points in the agent
+  lifecycle — session start, before/after tool use, on errors, and more.
+  Use this skill to author hooks, create lifecycle hooks, configure session
+  hooks, add pre/post tool hooks, or set up .github/hooks.
 license: MIT
 ---
 

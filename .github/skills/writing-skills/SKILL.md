@@ -1,9 +1,10 @@
 ---
 name: writing-skills
 description: >-
-  Guide for authoring Copilot CLI agent skills (SKILL.md files).
-  Use when asked to author a skill, create a SKILL.md, add agent skills,
-  set up a .github/skills directory, or write skill instructions.
+  Skills give agents reusable, on-demand expertise they can invoke by name
+  or that auto-activate from context.  Use this skill to author a SKILL.md,
+  add agent skills, set up a .github/skills directory, or write skill
+  instructions.
 license: MIT
 ---
 

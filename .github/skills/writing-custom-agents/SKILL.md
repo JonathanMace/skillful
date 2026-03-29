@@ -1,9 +1,10 @@
 ---
 name: writing-custom-agents
 description: >-
-  Guide for authoring Copilot CLI custom agent profiles (.agent.md files).
-  Use when asked to author a custom agent, create an agent profile,
-  set up .github/agents, or configure specialized Copilot personas.
+  Agent profiles let you define specialized Copilot personas with constrained
+  tools, custom models, and focused prompts.  Use this skill to author a
+  custom agent, create an agent profile, set up .github/agents, or configure
+  specialized Copilot personas.
 license: MIT
 ---
 
