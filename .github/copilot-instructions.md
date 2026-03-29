@@ -1,8 +1,11 @@
-This repository contains reusable Copilot CLI skills for authoring Copilot CLI customization artifacts — skills, custom instructions, custom agents, and hooks.
+This repository provides general-purpose Copilot CLI skills and agents that make common workflows more effective. The core problem: Copilot CLI agents don't know what Copilot CLI itself can do — they lack awareness of skills, hooks, agents, instructions, plugins, and other configuration mechanisms, and they have no expertise in using these features to build self-managing, self-sustaining repositories.
+
+The skills and agents here fill that gap. They are both **provided** (as reusable knowledge) and **used** (applied within this repo itself).
 
 ## Repository Structure
 
 - `.github/skills/` — Agent skills, each in its own subdirectory with a `SKILL.md`
+- `.github/agents/` — Custom agent profiles (`.agent.md` files)
 - `.github/copilot-instructions.md` — This file; repo-wide instructions
 
 ## Conventions
