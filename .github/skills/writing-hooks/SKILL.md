@@ -1,9 +1,10 @@
 ---
 name: writing-hooks
 description: >-
-  Hooks run custom commands automatically at key points in the agent lifecycle.
-  Use this skill to author hooks.json files, add pre/post tool guards, or
-  set up .github/hooks.
+  Hooks automatically run commands before or after agent actions — logging
+  activity, blocking unsafe commands, or triggering side effects.  Use this
+  skill to author hooks.json files, add pre/post tool guards, or set up
+  .github/hooks.
 license: MIT
 ---
 

@@ -1,10 +1,10 @@
 ---
 name: writing-skills
 description: >-
-  Skills give agents reusable, on-demand expertise they can invoke by name
-  or that auto-activate from context.  Use this skill to author a SKILL.md,
-  add agent skills, set up a .github/skills directory, or write skill
-  instructions.
+  Skills teach agents reusable procedures, workflows, and domain expertise
+  they can invoke by name or that auto-activate from context.  Use this skill
+  to author a SKILL.md, package a repeatable workflow, or set up a
+  .github/skills directory.
 license: MIT
 ---
 
@@ -69,11 +69,11 @@ Every skill requires a `SKILL.md` file (the filename must be exactly `SKILL.md`)
 
 ```yaml
 ---
-name: my-skill-name
+name: release-notes
 description: >-
-  Guide for authoring release notes with a consistent structure and
-  repository-specific checks. Use when drafting release notes, changelog
-  entries, or release summaries.
+  Produce consistent, well-structured release notes by summarizing changes,
+  categorizing features and fixes, and applying repository-specific checks.
+  Use when drafting release notes, changelog entries, or release summaries.
 license: MIT
 ---
 ```
@@ -88,32 +88,36 @@ Include `license` only when you want to declare the license for the skill; other
 
 ### Writing an Effective Description
 
-The `description` is the single most important field. Copilot uses it to decide when to auto-invoke the skill. Follow these guidelines:
+The `description` is the single most important field. Copilot uses it to decide when to auto-invoke the skill. Write **purpose-first** descriptions:
 
-1. **Lead with the outcome** — say what the skill helps Copilot accomplish, not what skills are in general.
+1. **Lead with what the artifact achieves** — the first sentence should explain the capability or outcome so agents discover the skill even when they don't know the Copilot CLI term for it.
 2. **State when to use it** — include trigger phrases and keywords that users would naturally type.
 3. **Be specific** — vague descriptions cause false matches or missed invocations.
 4. **Keep it concise** — 1–3 short sentences is usually enough.
 
-**Good examples:**
+**Good examples (purpose-first):**
 
 ```yaml
+# First sentence explains what the skill achieves, not what it is
 description: >-
-  Guide for debugging failing GitHub Actions workflows. Use when asked
-  to debug, fix, or investigate CI/CD failures, broken builds, or
-  failing GitHub Actions.
+  Diagnose and fix failing GitHub Actions workflows by analyzing logs,
+  reproducing failures locally, and applying targeted fixes.  Use when
+  asked to debug, fix, or investigate CI/CD failures or broken builds.
 ```
 
 ```yaml
 description: >-
-  Guide for authoring and reviewing pull request descriptions.
-  Use when creating PRs, drafting PR summaries, or improving
-  PR documentation.
+  Hooks automatically run commands before or after agent actions —
+  logging activity, blocking unsafe commands, or triggering side effects.
+  Use this skill to author hooks.json files or add pre/post tool guards.
 ```
 
 **Bad examples:**
 
 ```yaml
+# Tautological — requires the user to already know the term
+description: Guide for authoring GitHub Actions debugging skills.
+
 # Too vague — when would Copilot use this?
 description: Helps with code stuff.
 
@@ -144,8 +148,9 @@ Prefer cross-references over duplication — link to the durable doc, agent, or 
 ---
 name: github-actions-failure-debugging
 description: >-
-  Guide for debugging failing GitHub Actions workflows. Use when asked
-  to debug failing GitHub Actions workflows.
+  Diagnose and fix failing GitHub Actions workflows by analyzing logs,
+  reproducing failures locally, and applying targeted fixes.  Use when
+  asked to debug, fix, or investigate CI/CD failures or broken builds.
 ---
 
 To debug failing GitHub Actions workflows, follow this process:
@@ -202,7 +207,7 @@ Use the /github-actions-failure-debugging skill to fix the CI failures.
 
 1. **One skill per task domain** — keep skills focused and modular.
 2. **Define the trigger first** — articulate what kind of request should load this skill before writing the body. The body should be narrowly scoped to that trigger.
-3. **Author for auto-discovery** — invest effort in the `description` field so Copilot reliably finds your skill when needed.
+3. **Write purpose-first descriptions** — lead with what the skill achieves, not what it is. Agents discover skills by intent; a tautological description like "Guide for authoring X" only matches if the user already knows the term.
 4. **Prefer cross-references over duplication** — link to related agents, docs, hooks, or other skills that own deeper context rather than embedding long background sections.
 5. **Prefer skills over bloated instructions** — move task-specific guidance out of `copilot-instructions.md` and into skills to keep the base context lean.
 6. **Include concrete examples** — Copilot performs better when instructions include examples of expected behavior.
