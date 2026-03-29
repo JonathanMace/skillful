@@ -21,7 +21,7 @@ A well-authored skill should let a future contributor repeat the same workflow w
 3. **Define the trigger before authoring** — articulate the kind of request or task that should cause Copilot to load this skill. This becomes your `description` field and sets the scope boundary for the entire skill.
 4. **Choose a placement** — for Copilot CLI, prefer project-level (`.github/skills/`) or personal (`~/.copilot/skills/`).
 5. **Create a directory** named in lowercase with hyphens (e.g., `github-actions-debugging`).
-6. **Author the `SKILL.md`** — author YAML frontmatter (`name`, `description`, optional `license`) followed by a Markdown body with instructions. Keep the body narrowly scoped to the trigger you defined in step 3.
+6. **Author the `SKILL.md`** — author YAML frontmatter (`name`, `description`, optional `license`) followed by a Markdown body with instructions. Keep the body narrowly scoped to the trigger you defined in step 3. If the domain is broad, use the dispatcher pattern (see [Scaling Skills: The Dispatcher Pattern](#scaling-skills-the-dispatcher-pattern)) — keep the SKILL.md thin and point to deeper content files.
 7. **Add supporting files** (optional) — scripts, templates, or examples in the skill directory.
 8. **Review as if new to the repo** — re-read the skill from the perspective of someone who has never seen the repository. It should clearly explain when to use it, what steps to follow, what "done" looks like, and which related docs or validations must accompany the change.
 9. **Test the skill** — run `/skills reload`, then prompt Copilot with a task that should trigger it. Verify it activates and produces good results.
@@ -176,6 +176,68 @@ directory.
 
 Copilot can read and execute files within the skill directory when instructed to do so.
 
+## Scaling Skills: The Dispatcher Pattern
+
+### The Problem
+
+Copilot auto-loads every skill's `description` into context on every LLM call to decide which skills are relevant. At scale (dozens or hundreds of skills), this description overhead becomes significant. Additionally, complex domains may need far more content than fits comfortably in a single SKILL.md body without bloating the context when the skill fires.
+
+### The Solution: Thin Dispatchers with Deep Content
+
+Keep the `SKILL.md` thin — just a purpose-first description and a short body that **points the agent to deeper content files**. The agent is intelligent enough to open and follow any file you reference. Only the description is always loaded; the body is loaded only on match; and the referenced files are loaded only when the agent reads them.
+
+```
+.github/skills/
+└── ci-workflows/
+    ├── SKILL.md              # Thin dispatcher: description + routing logic
+    └── guides/
+        ├── debugging.md      # Deep content: CI debugging procedure
+        ├── authoring.md      # Deep content: writing new workflows
+        └── optimization.md   # Deep content: speeding up slow pipelines
+```
+
+### Dispatcher SKILL.md Example
+
+```markdown
+---
+name: ci-workflows
+description: >-
+  Diagnose failing CI pipelines, author new GitHub Actions workflows, and
+  optimize slow builds.  Use when asked to debug CI, fix broken builds,
+  write or edit GitHub Actions workflows, or speed up pipelines.
+---
+
+# CI Workflows
+
+This skill covers CI/CD with GitHub Actions. Read the guide that matches
+the task:
+
+- **Debugging a failure** — read and follow `guides/debugging.md`
+- **Authoring a new workflow** — read and follow `guides/authoring.md`
+- **Optimizing pipeline speed** — read and follow `guides/optimization.md`
+
+If the task spans multiple areas, read the relevant guides in order.
+```
+
+### When to Use the Dispatcher Pattern
+
+- The domain is broad enough that a single SKILL.md body would exceed ~200 lines or cover distinct sub-tasks.
+- You want a single description to cover several related capabilities without registering each as a separate skill.
+- Multiple skills or agents need to reference the same deep content — put the content in a shared location and point to it from each.
+
+### When NOT to Use It
+
+- The skill is simple enough to fit comfortably in a single SKILL.md body (~50-150 lines). Don't over-engineer.
+- The sub-topics are unrelated enough that they deserve separate descriptions for auto-matching. In that case, author separate skills.
+
+### Guidelines for Dispatcher Skills
+
+1. **Keep the dispatcher body short** — its job is routing, not teaching. A list of sub-topics with file references is enough.
+2. **Make routing unambiguous** — the agent should be able to pick the right file from the task description without guessing.
+3. **Deep content files follow the same structure as a SKILL.md body** — procedure, rules, examples, done criteria. They just lack frontmatter.
+4. **Use conditional routing when needed** — "If the project uses Python, read `guides/python.md`; if TypeScript, read `guides/typescript.md`."
+5. **Cross-reference freely** — deep content files can reference other files, scripts, templates, or even other skills.
+
 ## How Skills Are Invoked (Context for Authors)
 
 Understanding how skills are invoked helps you author better descriptions and instructions.
@@ -215,4 +277,5 @@ Use the /github-actions-failure-debugging skill to fix the CI failures.
 8. **Keep instructions actionable** — author numbered steps, not vague aspirations. Tell Copilot what to do, what to check, and when to use supporting files.
 9. **Match existing conventions** — if the repository already has skills, match their tone, frontmatter shape, and structural patterns.
 10. **Reference scripts for complex logic** — if a procedure involves complex shell commands or multi-step automation, include a script in the skill directory rather than embedding long code blocks in the Markdown.
-11. **Consider packaging as a plugin** — if you want to distribute a collection of skills (plus agents, hooks, and MCP configs), package them as a plugin for easy installation via `/plugin install`.
+11. **Use the dispatcher pattern for broad domains** — when a skill covers multiple sub-tasks or would exceed ~200 lines, keep the SKILL.md thin and route to deeper content files. This keeps description overhead low and avoids context bloat.
+12. **Consider packaging as a plugin** — if you want to distribute a collection of skills (plus agents, hooks, and MCP configs), package them as a plugin for easy installation via `/plugin install`.
