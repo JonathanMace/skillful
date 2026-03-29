@@ -10,6 +10,7 @@ This repository contains reusable Copilot CLI skills for authoring Copilot CLI c
 - Skills follow the official GitHub Copilot CLI SKILL.md format with YAML frontmatter (`name`, `description`, `license`)
 - Skill names are lowercase with hyphens, matching their directory name
 - All skills are self-contained and reference official GitHub documentation
+- Skill descriptions must be **purpose-first**: the first sentence explains what the artifact achieves, not what the skill is. This ensures agents discover skills by intent even when they don't know the Copilot CLI term. See the `writing-skills` skill for full guidance.
 
 ## Concurrent Agents and Git Worktrees
 
