@@ -15,13 +15,14 @@ Hooks let you author event-driven shell commands that run at specific points dur
 ## Procedure: Authoring Hooks
 
 1. **Decide whether a hook is the right mechanism** — for workflow instructions, author a skill instead. For persistent preferences, author custom instructions instead. For a specialized persona or delegated workflow, author a custom agent instead. For new external capabilities, add an MCP server. See the `writing-skills`, `writing-custom-agents`, and `writing-custom-instructions` skills.
-2. **Choose the trigger** — identify which lifecycle event should fire the hook (see [Available Hook Triggers](#available-hook-triggers) below).
-3. **Author or edit a `*.json` file in `.github/hooks/`** — the filename is up to you, and multiple hook files are supported.
-4. **Author the hook entry** — define `type: "command"`, provide `bash` and/or `powershell`, and set `cwd`, `timeoutSec`, and `env` when needed.
-5. **Author supporting scripts** (if needed) — for complex logic, reference external scripts rather than long inline commands.
-6. **Define the stdin/stdout contract** — confirm what JSON the hook will read on stdin and whether its stdout is ignored or interpreted.
-7. **Test the hook in isolation** — pipe representative JSON into your script and verify exit code, stderr logging, and stdout shape before deploying.
-8. **Test in a live session** — start a Copilot CLI session and trigger the lifecycle event. Verify the hook fires and behaves as expected.
+2. **Inspect existing hooks** — check `.github/hooks/` for existing hook files to avoid conflicts, understand existing triggers, and match conventions.
+3. **Choose the trigger** — identify which lifecycle event should fire the hook (see [Available Hook Triggers](#available-hook-triggers) below).
+4. **Author or edit a `*.json` file in `.github/hooks/`** — the filename is up to you, and multiple hook files are supported.
+5. **Author the hook entry** — define `type: "command"`, provide `bash` and/or `powershell`, and set `cwd`, `timeoutSec`, and `env` when needed.
+6. **Author supporting scripts** (if needed) — for complex logic, reference external scripts rather than long inline commands.
+7. **Define the stdin/stdout contract** — confirm what JSON the hook will read on stdin and whether its stdout is ignored or interpreted.
+8. **Test the hook in isolation** — pipe representative JSON into your script and verify exit code, stderr logging, and stdout shape before deploying.
+9. **Test in a live session** — start a Copilot CLI session and trigger the lifecycle event. Verify the hook fires and behaves as expected.
 
 ## When to Author Hooks (vs Other Customization)
 
@@ -300,6 +301,15 @@ Get-Content test-input.json -Raw | .\my-hook.ps1 | ConvertFrom-Json | ConvertTo-
 | Invalid JSON output | Ensure output is on a single line; use `jq -c` (Unix) or `ConvertTo-Json -Compress` (Windows) |
 | Script not found | Check `cwd`, use a path that matches that working directory, and ensure the script is executable on Unix-like systems |
 | Hook logs break behavior | Send logs to stderr; keep stdout reserved for compact JSON responses |
+
+## Done Criteria
+
+- Hook file is valid JSON with `version: 1` and at least one `hooks` entry
+- Trigger correctly maps to the intended agent event
+- Both `bash` and `powershell` commands provided (or justified single-platform)
+- Script handles missing dependencies gracefully
+- Hook tested in isolation (`copilot hooks test` if available) and in a live session
+- No conflicts with existing hooks on the same trigger
 
 ## Best Practices for Authoring Hooks
 

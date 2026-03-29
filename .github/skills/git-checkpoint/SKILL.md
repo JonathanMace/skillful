@@ -14,7 +14,24 @@ This skill defines the standard git lifecycle for agents working in a repository
 
 ## Procedure: Full Git Lifecycle
 
-### 1. Create a Branch
+### 1. Inspect the Repository
+
+Before creating any branches or making changes, ground yourself in the actual repository state:
+
+```bash
+# Determine the default branch name
+git symbolic-ref refs/remotes/origin/HEAD
+
+# List all local and remote branches
+git branch -a
+
+# Check remote configuration
+git remote -v
+```
+
+This avoids assumptions about the default branch name, existing branches, or remote setup. Use the discovered values in all subsequent steps.
+
+### 2. Create a Branch
 
 Pick a descriptive, kebab-case branch name scoped to the task (e.g., `add-login-validation`, `fix-ci-timeout`). Create it from the latest default branch:
 
@@ -25,7 +42,7 @@ git checkout -b <branch-name> origin/main
 
 Replace `main` with the repository's default branch if it differs.
 
-### 2. Create a Worktree (Multi-Agent or Concurrent Work)
+### 3. Create a Worktree (Multi-Agent or Concurrent Work)
 
 When multiple agents may be active in the same repository, each agent **must** work in its own git worktree to avoid conflicts. Create the worktree in a sibling directory following this convention:
 
@@ -42,11 +59,11 @@ cd ../my-repo-worktrees/add-login-validation
 
 > **When to skip worktrees:** If you are the only agent working in the repository and the user has not requested worktree isolation, you may work directly on a branch in the main checkout. When in doubt, use a worktree — it is always safe.
 
-### 3. Do the Work
+### 4. Do the Work
 
 Make your changes in the worktree (or branch checkout). Follow any project-specific conventions, linters, and tests before moving to the commit step.
 
-### 4. Commit
+### 5. Commit
 
 Stage and commit with a clear, conventional message. Always include the Copilot co-author trailer:
 
@@ -68,7 +85,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 
 Prefer small, atomic commits over large monolithic ones when the work is logically separable.
 
-### 5. Push
+### 6. Push
 
 Push the branch to the remote:
 
@@ -82,7 +99,7 @@ If the branch already exists on the remote and you have rebased, force-push with
 git push --force-with-lease origin <branch-name>
 ```
 
-### 6. Create a Pull Request
+### 7. Create a Pull Request
 
 Create a PR targeting the default branch. Include:
 
@@ -103,7 +120,7 @@ Or use the GitHub MCP server tools if the CLI is unavailable.
 - Include before/after evidence (test output, screenshots) when the change affects behavior.
 - Request review when required by the project's branch protection rules.
 
-### 7. Squash-Merge
+### 8. Squash-Merge
 
 Once the PR is approved (or if no review is required), squash-merge it:
 
@@ -113,7 +130,7 @@ gh pr merge <pr-number> --squash --delete-branch
 
 The `--delete-branch` flag deletes the remote branch automatically. If the project prefers a different merge strategy, follow that instead.
 
-### 8. Clean Up
+### 9. Clean Up
 
 After merging, clean up all local artifacts:
 

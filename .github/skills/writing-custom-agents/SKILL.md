@@ -321,6 +321,15 @@ Choose the model for each subagent based on the task:
 5. **Keep files focused** — one instruction file per specialty. If a file grows beyond ~150 lines, consider splitting it further.
 6. **Cross-reference freely** — instruction files can tell the subagent to read additional files (templates, rule lists, project configs) as needed.
 
+## Done Criteria
+
+- `.agent.md` file created in the correct location with valid frontmatter
+- `description` clearly conveys when Copilot should auto-delegate to this agent
+- Tools constrained to the minimum required for the agent's role
+- Prompt body defines clear behavioral boundaries (what to do AND what not to do)
+- Agent tested via `/agent` selection and auto-delegation verified (or `disable-model-invocation` confirmed)
+- No naming conflicts with existing agents
+
 ## Best Practices for Authoring Agents
 
 1. **Author a clear description** — this is how Copilot decides when to delegate. Include the domain and trigger keywords.

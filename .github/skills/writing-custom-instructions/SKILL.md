@@ -1,10 +1,10 @@
 ---
 name: writing-custom-instructions
 description: >-
-  Instructions are always included with every agent session.  If you need
-  to enforce rules, behavioral expectations, or persistent guidance across
-  all Copilot sessions, use this skill.  Use when asked to author custom
-  instructions, configure copilot-instructions, or set up repo instructions.
+  Enforce coding standards, workflow rules, and persistent behavioral
+  guidance across all Copilot sessions by authoring instruction files
+  that load automatically.  Use when asked to author custom instructions,
+  configure copilot-instructions, or set up repo instructions.
 license: MIT
 ---
 

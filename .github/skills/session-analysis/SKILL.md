@@ -190,3 +190,17 @@ Events are linked by `toolCallId` — a tool start and its completion share the 
 - **Lines added vs removed** — large net additions may warrant review; high churn (both high adds and removes) may indicate iteration
 - **Commit frequency** — many small commits suggests incremental work; few large commits may indicate batch operations
 - **Branch count** — multiple branches may indicate parallel workstreams or exploratory approaches
+
+## Done Criteria
+
+- Session log located and readable
+- Summary produced covering key metrics (duration, turns, tool calls, token usage)
+- Specific user questions answered with evidence from the log
+- Key anomalies or patterns identified and explained
+- Recommendations provided if analysis reveals inefficiencies
+
+## Cross-References
+
+- `writing-skills` — skill invocation events (`skill.invoked`) in session logs correspond to skills authored with that guidance
+- `writing-hooks` — hook execution events map to hooks authored with that skill
+- `writing-custom-agents` — subagent lifecycle events (`subagent.started`, `subagent.completed`) correspond to agents and embedded subagent instructions authored with that skill

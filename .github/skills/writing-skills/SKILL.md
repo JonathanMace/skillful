@@ -265,6 +265,18 @@ Use the /github-actions-failure-debugging skill to fix the CI failures.
 | `/skills add` | Add an alternative skills directory |
 | `/skills remove SKILL-DIR` | Remove a directly-added skill |
 
+## Done Criteria
+
+- Skill directory created with lowercase-hyphen name matching `name` frontmatter field
+- `SKILL.md` has valid YAML frontmatter (`name`, `description`, and optionally `license`)
+- Description is purpose-first — first sentence explains what the skill achieves, not what it is
+- Description includes trigger phrases for auto-invocation
+- Body includes a numbered procedure with an "Inspect First" opening step
+- Cross-references to related skills, agents, or docs present (no unnecessary duplication)
+- Examples included where helpful
+- Done criteria section defined
+- Skill tested with `/skills reload` and verified via both auto-invocation and explicit `/skill-name` prompt
+
 ## Best Practices for Authoring Skills
 
 1. **One skill per task domain** — keep skills focused and modular.
