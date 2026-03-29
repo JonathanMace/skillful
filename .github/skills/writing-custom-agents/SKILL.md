@@ -1,9 +1,10 @@
 ---
 name: writing-custom-agents
 description: >-
-  Agent profiles define specialized Copilot personas with constrained tools,
-  custom models, and focused prompts.  Use this skill to author an .agent.md,
-  set up .github/agents, or configure specialized Copilot personas.
+  Custom agents create specialized Copilot helpers for recurring jobs by
+  giving them a focused role, prompt, model, and tool access.  Use this
+  skill to author an .agent.md, set up .github/agents, or configure
+  specialized Copilot personas.
 license: MIT
 ---
 
