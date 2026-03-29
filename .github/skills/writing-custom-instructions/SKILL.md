@@ -1,9 +1,9 @@
 ---
 name: writing-custom-instructions
 description: >-
-  Guide for authoring Copilot CLI custom instruction files including
-  copilot-instructions.md, path-specific *.instructions.md files, and
-  AGENTS.md. Use when asked to author custom instructions, configure
+  Instructions are always included with every agent session.  If you need
+  to enforce rules or persistent guidance on Copilot agents and sessions, 
+  use this skill.  Use when asked to author custom instructions, configure
   copilot-instructions, set up repo instructions, or create AGENTS.md.
 license: MIT
 ---
