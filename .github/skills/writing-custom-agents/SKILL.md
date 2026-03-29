@@ -1,24 +1,23 @@
 ---
 name: writing-custom-agents
 description: >-
-  Agent profiles let you define specialized Copilot personas with constrained
-  tools, custom models, and focused prompts.  Use this skill to author a
-  custom agent, create an agent profile, set up .github/agents, or configure
-  specialized Copilot personas.
+  Guide for authoring .agent.md custom agent profiles for GitHub Copilot CLI.
+  Use this skill to author a custom agent, author an agent profile, set up
+  .github/agents, or configure specialized Copilot personas.
 license: MIT
 ---
 
 # Authoring Custom Agents for GitHub Copilot CLI
 
-Custom agents are specialized Copilot personas with tailored expertise, tool access, and behavioral instructions. They are defined in `.agent.md` files and loaded as available agent profiles that Copilot can delegate work to via subagents.
+Custom agents are specialized Copilot personas with tailored expertise, tool access, and behavioral instructions. Author them as `.agent.md` files — typically in `.github/agents/` for a repository — so Copilot CLI can surface them as agent profiles and delegate matching tasks to them.
 
 ## Procedure: Authoring a Custom Agent
 
 1. **Decide whether a custom agent is the right mechanism** — for simple coding conventions, author custom instructions instead. For task-specific procedures without a persona, author a skill instead (see the `writing-skills` and `writing-custom-instructions` skills).
 2. **Inspect existing agents** — check `.github/agents/` and `~/.copilot/agents/` for existing agents to avoid naming conflicts and match conventions.
-3. **Define the agent's specialty** — articulate who this agent is, what it does, and what tasks should trigger delegation to it. This becomes the `description` field.
+3. **Define the agent's specialty** — articulate who this agent is, what it does, and what tasks should trigger delegation to it. This becomes the `description` field, so lead with the purpose and then include likely trigger phrases.
 4. **Choose the tool set** — decide which tools the agent needs. Constrain tools to the minimum required for the agent's role.
-5. **Author the `.agent.md` file** — write YAML frontmatter, then a Markdown prompt body defining the agent's behavior, responsibilities, and constraints.
+5. **Author the `.agent.md` file** — author the YAML frontmatter, then a Markdown prompt body defining the agent's behavior, responsibilities, and constraints.
 6. **Review as if new to the repo** — re-read the agent profile from the perspective of someone unfamiliar with the project. The description should clearly convey when Copilot should delegate to this agent, and the prompt body should define clear boundaries.
 7. **Test the agent** — invoke it with `/agent`, select it, and verify it behaves as expected. Confirm auto-delegation triggers correctly (or does not, if `disable-model-invocation: true`).
 
@@ -41,12 +40,14 @@ Custom agents are Markdown files with YAML frontmatter, using the `.agent.md` ex
 | Scope | Location |
 |-------|----------|
 | **Repository-level** | `.github/agents/` in the repo |
-| **User-level** | `~/.copilot/agents/` |
+| **User-level / personal** | `~/.copilot/agents/` |
 | **Organization/Enterprise** | `/agents/` in the `.github-private` repo |
 
-**Precedence on naming conflicts:** system-level > repository-level > organization-level.
+**Precedence on naming conflicts:** system > repository > organization. Personal agents are an additional local scope; avoid reusing names that could cause ambiguous selection across scopes.
 
 ## YAML Frontmatter Properties
+
+`description` is the only required frontmatter property. Copilot CLI also supports `name`, `tools`, `model`, `disable-model-invocation`, `user-invocable`, `mcp-servers`, `metadata`, and `target`.
 
 ```yaml
 ---
@@ -70,6 +71,10 @@ user-invocable: true
 | `mcp-servers` | object | No | MCP servers available only to this agent. |
 | `metadata` | object | No | Arbitrary key-value pairs for documentation/tracking. |
 | `target` | string | No | Restrict to `vscode` or `github-copilot` environment. Omit for both. |
+
+> `infer` is retired. Use `disable-model-invocation` to control whether Copilot may auto-delegate to the agent.
+
+For most agents, author `description` first, then add the other properties only when they are needed to constrain behavior, tool access, or availability.
 
 ## Tool Configuration
 
@@ -107,7 +112,7 @@ tools: ["read", "search", "github/list_pull_requests", "custom-mcp/*"]
 
 ## Prompt Body
 
-Below the frontmatter, write the agent's behavioral instructions in Markdown. This defines the agent's expertise, workflow, and constraints.
+Below the frontmatter, author the agent's behavioral instructions in Markdown. This defines the agent's expertise, workflow, and constraints.
 
 **Maximum length:** 30,000 characters.
 
@@ -142,19 +147,38 @@ Always include clear test descriptions and use appropriate testing patterns for 
 ```markdown
 ---
 name: implementation-planner
-description: Creates detailed implementation plans and technical specifications in markdown format
+description: Plans implementations and authors technical specifications in markdown format
 tools: ["read", "search", "edit"]
 ---
 
 You are a technical planning specialist. Your responsibilities:
 
 - Analyze requirements and break them into actionable tasks
-- Create detailed technical specifications and architecture docs
+- Author detailed technical specifications and architecture docs
 - Generate implementation plans with clear steps and dependencies
 - Document API designs, data models, and system interactions
 
 Focus on creating thorough documentation rather than implementing code.
 Always structure plans with clear headings, task breakdowns, and acceptance criteria.
+```
+
+### Example: Manual-Only Destructive Agent
+
+```markdown
+---
+name: schema-migrator
+description: Reviews and applies high-risk database schema changes when explicitly asked to plan or execute migrations
+tools: ["read", "search", "execute"]
+disable-model-invocation: true
+user-invocable: true
+---
+
+You are a database migration specialist.
+
+- Review proposed schema changes for risk, rollout order, and rollback steps
+- Require an explicit user request before executing destructive commands
+- Prefer dry runs, backups, and staged rollout guidance when available
+- Clearly call out downtime, locking, or data-loss risk before proceeding
 ```
 
 ### Example: Agent with MCP Server
@@ -197,6 +221,8 @@ Use the test-specialist agent to review test coverage for the auth module.
 ```
 
 Copilot infers the correct agent from the prompt.
+
+If `user-invocable` is `false`, do not expect the agent to appear as a user-selectable option even if its profile is otherwise valid.
 
 ### Command-Line Argument
 

@@ -1,26 +1,26 @@
 ---
 name: writing-hooks
 description: >-
-  Hooks let you run custom commands automatically at key points in the agent
-  lifecycle — session start, before/after tool use, on errors, and more.
-  Use this skill to author hooks, create lifecycle hooks, configure session
-  hooks, add pre/post tool hooks, or set up .github/hooks.
+  Author JSON hook configuration files that run custom commands at key Copilot
+  CLI lifecycle events. Use this skill to author hook configuration files,
+  add pre/post tool hooks, or set up .github/hooks.
 license: MIT
 ---
 
 # Authoring Hooks for GitHub Copilot CLI
 
-Hooks let you execute custom shell commands at specific points during a Copilot CLI session lifecycle. They provide programmable control and observability around Copilot's behavior — enforcing guardrails, logging activity, and automating responses to events.
+Hooks let you author event-driven shell commands that run at specific points during a Copilot CLI session lifecycle. They provide programmable guardrails, logging, and automation around prompts, tool use, errors, and session boundaries.
 
-## Procedure: Authoring a Hook
+## Procedure: Authoring Hooks
 
-1. **Decide whether a hook is the right mechanism** — for workflow instructions, author a skill instead. For persistent preferences, author custom instructions instead. For new external capabilities, add an MCP server. See the `writing-skills` and `writing-custom-instructions` skills.
+1. **Decide whether a hook is the right mechanism** — for workflow instructions, author a skill instead. For persistent preferences, author custom instructions instead. For a specialized persona or delegated workflow, author a custom agent instead. For new external capabilities, add an MCP server. See the `writing-skills`, `writing-custom-agents`, and `writing-custom-instructions` skills.
 2. **Choose the trigger** — identify which lifecycle event should fire the hook (see [Available Hook Triggers](#available-hook-triggers) below).
-3. **Create or edit a hook JSON file** in `.github/hooks/` — you can have multiple files with any name.
-4. **Author the hook entry** — define the command for `bash` and/or `powershell`, set a working directory and timeout.
-5. **Author supporting scripts** (if needed) — for complex logic, reference external scripts rather than inline commands.
-6. **Test the hook in isolation** — pipe sample JSON into your script and verify exit code and output before deploying.
-7. **Test in a live session** — start a Copilot CLI session and trigger the lifecycle event. Verify the hook fires and behaves as expected.
+3. **Author or edit a `*.json` file in `.github/hooks/`** — the filename is up to you, and multiple hook files are supported.
+4. **Author the hook entry** — define `type: "command"`, provide `bash` and/or `powershell`, and set `cwd`, `timeoutSec`, and `env` when needed.
+5. **Author supporting scripts** (if needed) — for complex logic, reference external scripts rather than long inline commands.
+6. **Define the stdin/stdout contract** — confirm what JSON the hook will read on stdin and whether its stdout is ignored or interpreted.
+7. **Test the hook in isolation** — pipe representative JSON into your script and verify exit code, stderr logging, and stdout shape before deploying.
+8. **Test in a live session** — start a Copilot CLI session and trigger the lifecycle event. Verify the hook fires and behaves as expected.
 
 ## When to Author Hooks (vs Other Customization)
 
@@ -29,19 +29,19 @@ Hooks let you execute custom shell commands at specific points during a Copilot 
 - **Author custom instructions** for persistent preferences and coding standards.
 - **Add MCP servers** for new external capabilities and tool integrations.
 
-## File Location
+## File Location and Scope
 
 ```
 .github/hooks/
-├── my-hooks.json       # Any name ending in .json
+├── hooks.json          # Any filename ending in .json works
 └── security-hooks.json # Multiple hook files are supported
 ```
 
-Hook files must be on the repository's **default branch** for the coding agent to use them. Copilot CLI loads hooks from the `.github/hooks/` directory in the current working directory.
+Copilot CLI loads hook files from `.github/hooks/*.json` in the repository rooted at the current working directory. Hook files must be on the repository's **default branch** for Copilot coding agent to use them.
 
 ## Configuration Format
 
-Hooks are defined in a JSON file with `version: 1`:
+Hooks are defined in JSON with `version: 1` and a `hooks` object whose keys are lifecycle trigger names. Include only the triggers you need; each trigger maps to an array of hook entries, and multiple entries run in order.
 
 ```json
 {
@@ -61,20 +61,20 @@ Hooks are defined in a JSON file with `version: 1`:
 
 ## Available Hook Triggers
 
-| Hook | Fires When |
-|------|-----------|
-| `sessionStart` | A CLI session begins |
-| `sessionEnd` | A CLI session ends |
-| `userPromptSubmitted` | A user submits a prompt |
-| `preToolUse` | Before a tool is executed |
-| `postToolUse` | After a tool finishes executing |
-| `errorOccurred` | An error occurs during execution |
-| `agentStop` | The main agent stops without an error |
-| `subagentStop` | A subagent completes its task |
+| Hook | Fires When | Notes |
+|------|-----------|-------|
+| `sessionStart` | A CLI session begins or resumes | Useful for initialization and audit logging |
+| `sessionEnd` | A CLI session ends | Useful for cleanup and final reporting |
+| `userPromptSubmitted` | A user submits a prompt | Good for prompt logging or policy checks |
+| `preToolUse` | Before a tool is executed | The only hook type that can deny tool execution |
+| `postToolUse` | After a tool finishes executing | Useful for audit logs, metrics, and failure alerts |
+| `errorOccurred` | An error occurs during execution | Useful for error logging and notifications |
+| `agentStop` | The main agent finishes responding | Useful for end-of-response automation |
+| `subagentStop` | A subagent completes before returning to its parent | Useful for delegated-task logging |
 
 ## Hook Command Syntax
 
-Each hook entry specifies commands for `bash` and/or `powershell`:
+Each hook entry is a JSON object. Use `type: "command"` and author `bash`, `powershell`, or both:
 
 ```json
 {
@@ -92,13 +92,67 @@ Each hook entry specifies commands for `bash` and/or `powershell`:
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | `type` | string | Yes | Must be `"command"` |
-| `bash` | string | No* | Shell command for Unix/macOS |
-| `powershell` | string | No* | Shell command for Windows |
-| `cwd` | string | No | Working directory for the command |
+| `bash` | string | Yes on Unix-like systems* | Command to run on Unix-like systems |
+| `powershell` | string | Yes on Windows* | Command to run on Windows |
+| `cwd` | string | No | Working directory, relative to the repository root |
 | `timeoutSec` | number | No | Timeout in seconds (default: 30) |
-| `env` | object | No | Additional environment variables |
+| `env` | object | No | Additional environment variables merged into the existing environment |
 
-*At least one of `bash` or `powershell` should be provided.
+*At least one of `bash` or `powershell` must be provided. For portable hooks, author both.
+
+## Hook Input and Output
+
+### Input JSON
+
+Hook scripts receive **compact JSON on stdin**. The payload depends on the trigger:
+
+| Trigger | Important input fields |
+|---------|------------------------|
+| `sessionStart` | `timestamp`, `cwd`, `source`, `initialPrompt` |
+| `sessionEnd` | `timestamp`, `cwd`, `reason` |
+| `userPromptSubmitted` | `timestamp`, `cwd`, `prompt` |
+| `preToolUse` | `timestamp`, `cwd`, `toolName`, `toolArgs` |
+| `postToolUse` | `timestamp`, `cwd`, `toolName`, `toolArgs`, `toolResult.resultType`, `toolResult.textResultForLlm` |
+| `errorOccurred` | `timestamp`, `cwd`, `error` |
+| `agentStop` | Session-completion context for the main agent |
+| `subagentStop` | Completion context for the subagent |
+
+Notes:
+
+- `toolArgs` is itself a JSON string, so many hooks need to parse JSON twice.
+- Input arrives on stdin; do not expect positional command-line arguments.
+- For trigger-specific payload details, consult the official **Hooks configuration** reference before authoring a non-trivial script.
+
+### Output JSON
+
+Hook scripts can emit **compact JSON on stdout**, but not every hook type consumes it:
+
+- **`preToolUse`** can return a decision object such as `{"permissionDecision":"deny","permissionDecisionReason":"Destructive command blocked"}`.
+- `permissionDecision` may be `allow`, `deny`, or `ask`, but only **`deny` is currently processed**.
+- Other hook types may write JSON to stdout, but current CLI behavior ignores that output.
+- Send diagnostics to **stderr**, not stdout, because stdout is reserved for hook responses.
+
+### Minimal script patterns
+
+**Bash**
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+INPUT=$(cat)
+TOOL_NAME=$(echo "$INPUT" | jq -r '.toolName // empty')
+TOOL_ARGS=$(echo "$INPUT" | jq -r '.toolArgs // "{}"')
+```
+
+**PowerShell**
+
+```powershell
+$ErrorActionPreference = "Stop"
+$inputJson = [Console]::In.ReadToEnd() | ConvertFrom-Json
+$toolName = $inputJson.toolName
+$toolArgs = if ($inputJson.toolArgs) { $inputJson.toolArgs | ConvertFrom-Json } else { $null }
+```
 
 ## Examples
 
@@ -140,8 +194,8 @@ Each hook entry specifies commands for `bash` and/or `powershell`:
       {
         "type": "command",
         "bash": "./scripts/log-prompt.sh",
-        "powershell": "./scripts/log-prompt.ps1",
-        "cwd": "scripts",
+        "powershell": ".\\scripts\\log-prompt.ps1",
+        "cwd": ".",
         "env": {
           "LOG_LEVEL": "INFO"
         }
@@ -161,7 +215,7 @@ Each hook entry specifies commands for `bash` and/or `powershell`:
       {
         "type": "command",
         "bash": "./scripts/validate-tool.sh",
-        "powershell": "./scripts/validate-tool.ps1",
+        "powershell": ".\\scripts\\validate-tool.ps1",
         "cwd": ".",
         "timeoutSec": 5
       }
@@ -170,22 +224,30 @@ Each hook entry specifies commands for `bash` and/or `powershell`:
 }
 ```
 
-The hook script receives a JSON payload on stdin with context about the tool being invoked (tool name, arguments, etc.). The script can output JSON to modify behavior (e.g., block execution).
+For `preToolUse`, the script can deny execution by returning compact JSON such as:
 
-## Hook Input and Output
+```json
+{"permissionDecision":"deny","permissionDecisionReason":"Dangerous command detected"}
+```
 
-### Input
+### Post-Tool Audit Logging
 
-Hook scripts receive a JSON object on stdin containing context about the triggering event. The payload varies by hook type but commonly includes:
-
-- `timestamp` — when the event occurred
-- `cwd` — current working directory
-- `toolName` — (for tool hooks) the tool being invoked
-- `toolArgs` — (for tool hooks) the tool's arguments as a JSON string
-
-### Output
-
-Hook scripts can output JSON to influence agent behavior. The output must be **compact JSON on a single line**.
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": "./scripts/log-tool-result.sh",
+        "powershell": ".\\scripts\\log-tool-result.ps1",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
 
 ## Debugging Hooks
 
@@ -200,34 +262,52 @@ echo "$INPUT" >&2
 # ... rest of script
 ```
 
+```powershell
+$ErrorActionPreference = "Stop"
+$rawInput = [Console]::In.ReadToEnd()
+Write-Error "DEBUG: Received input"
+Write-Error $rawInput
+```
+
 ### Test hooks locally
 
 ```bash
 # Pipe test input into your hook script
-echo '{"timestamp":1704614400000,"cwd":"/tmp","toolName":"bash","toolArgs":"{\"command\":\"ls\"}"}' | ./my-hook.sh
+echo '{"timestamp":1704614400000,"cwd":"/path/to/project","toolName":"bash","toolArgs":"{\"command\":\"ls\"}"}' | ./my-hook.sh
 
 # Check exit code
 echo $?
 
 # Validate output is valid JSON
-./my-hook.sh < test-input.json | jq .
+./my-hook.sh < test-input.json | jq -c .
+```
+
+```powershell
+# Pipe test input into your hook script
+'{"timestamp":1704614400000,"cwd":"C:\\repo","toolName":"view","toolArgs":"{\"path\":\"README.md\"}"}' | .\my-hook.ps1
+
+# Validate output is compact JSON
+Get-Content test-input.json -Raw | .\my-hook.ps1 | ConvertFrom-Json | ConvertTo-Json -Compress
 ```
 
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| Hooks not executing | Verify JSON is in `.github/hooks/`, check for valid JSON syntax, ensure `version: 1` is set |
+| Hooks not executing | Verify the file is in `.github/hooks/`, check JSON syntax, ensure `version: 1` is set, and confirm the file is on the default branch if you need coding-agent support |
 | Hooks timing out | Increase `timeoutSec`, optimize script performance |
 | Invalid JSON output | Ensure output is on a single line; use `jq -c` (Unix) or `ConvertTo-Json -Compress` (Windows) |
-| Script not found | Check `cwd` is correct, ensure script is executable (`chmod +x`) |
+| Script not found | Check `cwd`, use a path that matches that working directory, and ensure the script is executable on Unix-like systems |
+| Hook logs break behavior | Send logs to stderr; keep stdout reserved for compact JSON responses |
 
 ## Best Practices for Authoring Hooks
 
 1. **Keep hooks fast** — hooks run synchronously and block the agent. Use reasonable timeouts.
 2. **Provide both `bash` and `powershell`** — ensures cross-platform compatibility.
-3. **Log to stderr for debugging** — stdout is parsed as the hook's response; diagnostic output should go to stderr.
-4. **Use scripts for complex logic** — inline commands get unwieldy; reference external scripts.
-5. **Test hooks in isolation** — pipe sample JSON into your scripts before deploying.
-6. **Set appropriate timeouts** — the default 30 seconds is generous; most hooks should complete in under 5 seconds.
-7. **Don't block unnecessarily** — hooks that block tool use should have clear, documented reasons.
+3. **Treat stdin as the API contract** — author scripts against the documented JSON payload for that trigger.
+4. **Use compact JSON on stdout** — especially for `preToolUse`; log diagnostics to stderr.
+5. **Use scripts for complex logic** — inline commands get unwieldy; reference external scripts.
+6. **Test hooks in isolation** — pipe sample JSON into your scripts before deploying.
+7. **Set appropriate timeouts** — the default 30 seconds is generous; most hooks should complete in under 5 seconds.
+8. **Don't block unnecessarily** — hooks that deny tool use should have clear, documented reasons.
+9. **Validate and sanitize inputs** — hook payloads may contain untrusted prompt text, tool arguments, and error messages.
