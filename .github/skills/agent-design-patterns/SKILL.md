@@ -2,8 +2,9 @@
 name: agent-design-patterns
 description: >-
   Named design patterns for structuring multi-agent systems — reviewer panels,
-  mentor constellations, and ritual cadences. Use when authoring agents that
-  need to work together as a coordinated system rather than as isolated helpers.
+  mentor constellations, ritual cadences, and dynamic research teams. Use when
+  authoring agents that need to work together as a coordinated system rather
+  than as isolated helpers.
 license: MIT
 ---
 
@@ -51,3 +52,14 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 **When to use**: Long-running autonomous sessions where agents accumulate stale state, unfinished work, or strategic drift.
 
 → Read `.github/skills/agent-design-patterns/patterns/ritual-cadence.md` for full implementation guidance.
+
+### Research Team
+
+> A coordinator agent that delegates all substantive work to team member
+> subagents — recruiting, briefing, and dispatching specialists dynamically.
+> The coordinator orchestrates and synthesises but never performs the work
+> itself.
+
+**When to use**: Multi-step investigative, creative, or development projects where the work spans multiple domains, benefits from parallel specialist effort, and evolves as new questions emerge.
+
+→ Read `.github/skills/agent-design-patterns/patterns/research-team.md` for full implementation guidance.
