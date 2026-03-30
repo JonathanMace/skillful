@@ -2,7 +2,8 @@
 name: agent-design-patterns
 description: >-
   Named design patterns for structuring multi-agent systems — reviewer panels,
-  mentor constellations, ritual cadences, and dynamic research teams. Use when
+  mentor constellations, ritual cadences, dynamic research teams, escalation
+  ladders, blackboard collaboration, and compensating workflows. Use when
   authoring agents that need to work together as a coordinated system rather
   than as isolated helpers.
 license: MIT
@@ -63,3 +64,38 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 **When to use**: Multi-step investigative, creative, or development projects where the work spans multiple domains, benefits from parallel specialist effort, and evolves as new questions emerge.
 
 → Read `.github/skills/agent-design-patterns/patterns/research-team.md` for full implementation guidance.
+
+### Escalation Ladder
+
+> A chain of agent tiers from cheapest/fastest to most expensive/capable, where
+> each tier attempts the task with explicit self-assessment criteria and
+> escalates to the next tier only when it detects it cannot handle the task
+> confidently — passing partial work, observations, and escalation reason as
+> enriched context.
+
+**When to use**: Tasks that vary in difficulty but where you don't know upfront which capability tier is needed, and using the most expensive agent for everything is wasteful.
+
+→ Read `.github/skills/agent-design-patterns/patterns/escalation-ladder.md` for full implementation guidance.
+
+### Blackboard (Shared Scratchpad)
+
+> Multiple agents collaborate on a single evolving artifact through a structured
+> shared file — the blackboard. Agents read the current state, contribute to
+> their assigned section, and write back. The file's schema prevents conflicts,
+> and git provides an audit trail. No coordinator synthesises; the artifact
+> assembles itself through structured contributions.
+
+**When to use**: Multi-agent collaboration on a single document or artifact where contributions span different domains and no single agent has the full picture, but a coordinator bottleneck is undesirable.
+
+→ Read `.github/skills/agent-design-patterns/patterns/blackboard.md` for full implementation guidance.
+
+### Compensating Workflow (Saga)
+
+> Each forward step in a multi-step workflow is paired with a compensating
+> action that undoes its effects. On failure, compensating actions execute in
+> reverse order, restoring the system to a clean state instead of leaving
+> orphaned resources, partial reservations, and dangling artifacts.
+
+**When to use**: Multi-step agent workflows that modify external state — files, branches, API calls, bookings, registrations, notifications, procurement orders, deployments — where partial failure would leave the system in an inconsistent state requiring manual cleanup.
+
+→ Read `.github/skills/agent-design-patterns/patterns/compensating-workflow.md` for full implementation guidance.

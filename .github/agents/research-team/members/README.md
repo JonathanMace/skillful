@@ -10,6 +10,7 @@ available team members, their categories, domains, and dispatch history.
 | Generalizability Reviewer | `generalizability-reviewer.md` | Review | Domain-agnostic design critique | Artifact review panel | Initial setup |
 | Testability Reviewer | `testability-reviewer.md` | Review | Empirical validation and falsifiability | Artifact review panel | Initial setup |
 | Autonomy Reviewer | `autonomy-reviewer.md` | Review | Self-sufficiency and self-correction | Artifact review panel | Initial setup |
+| Pattern Writer | `pattern-writer.md` | Production | Multi-agent pattern documentation | New design patterns research | Cycle 1 |
 
 ## Archived Members
 
