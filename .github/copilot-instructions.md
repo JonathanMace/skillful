@@ -43,3 +43,7 @@ The user often gives commands concurrently. By default, **delegate each top-leve
 ## Skill Discovery
 
 Before starting any task, check whether a relevant skill is available. Use `/skills list` or rely on auto-invocation to find skills that match the current task. Skills provide curated, task-specific guidance that produces better results than working from general knowledge alone.
+
+## Maintenance
+
+At the start of each session, check if any maintenance tasks are due by reading `.github/maintenance-state.md`. If the file doesn't exist or any tasks are overdue, invoke the `maintenance-runner` agent or follow the execution protocol in `.github/skills/maintenance-tasks/SKILL.md`.
