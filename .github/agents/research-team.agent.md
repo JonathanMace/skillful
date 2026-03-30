@@ -36,7 +36,7 @@ If a required domain lacks a team member:
 - **First, check if an existing member can cover the gap** with a tailored dispatch prompt. Only recruit if the gap is a fundamentally different specialism you expect to reuse.
 - Author a new instruction file in `.github/agents/research-team/members/<member-name>.md`
 - Read `.github/skills/agent-design-patterns/patterns/research-team.md` for the member file structure and conventions
-- Every member file must include: Role, What You Do, What You Do NOT Do (naming who does), Output Format, Working Method
+- Every member file must include: Role, What You Do (or a domain-specific variant like "What You Review"), What You Do NOT Do (naming who does), Output Format, Working Method
 - **Self-check**: verify the new file contains all required sections before dispatching
 - Update the roster `README.md` with the new member's category, domain, and "Last Dispatched" date
 - For critical roles, dispatch the review panel against the member file before first use

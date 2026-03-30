@@ -5,7 +5,7 @@ The skills and agents here fill that gap. They are both **provided** (as reusabl
 ## Repository Structure
 
 - `.github/skills/` — Agent skills, each in its own subdirectory with a `SKILL.md`
-- `.github/agents/` — Custom agent profiles (`.agent.md` files)
+- `.github/agents/` — Custom agent profiles (`.agent.md` files) and their supporting subdirectories (e.g., embedded subagent instructions in `<agent>/members/`)
 - `.github/copilot-instructions.md` — This file; repo-wide instructions
 
 ## Conventions

@@ -115,7 +115,7 @@ The coordinator follows a consistent decision loop for every task:
 2. **Assess** — what domains of expertise does this require? What are the key questions?
 3. **Review roster** — read `members/README.md` to see who's available
 4. **Identify gaps** — which required domains lack a team member?
-5. **Recruit** — for each gap, author a new instruction file and update the roster. After authoring, verify the file contains all required sections (Role, What You Do, What You Do NOT Do, Output Format, Working Method). For critical roles, dispatch the review panel against the member file before first use.
+5. **Recruit** — for each gap, author a new instruction file and update the roster. After authoring, verify the file contains all required sections (Role, What You Do or domain-specific variant, What You Do NOT Do, Output Format, Working Method). For critical roles, dispatch the review panel against the member file before first use.
 6. **Dispatch** — spawn subagents via the `task` tool, each reading its instruction file. Include an **expected-outcome statement** in each dispatch prompt. If more than half of dispatched members fail in the same wave, do NOT retry individually — log the collective failure, reduce the next wave size, and wait one cycle before full-scale dispatch.
 7. **Triage results** — for each member result, verify it addresses the assigned task and contains substantive content. If a member failed (garbage, timeout, empty result): retry once with a more specific prompt. If it fails again, flag the gap in the synthesis as "not investigated — member failure."
 8. **Synthesise** — collect results, resolve conflicts, produce a unified deliverable. Genuine synthesis means surfacing contradictions, identifying cross-cutting themes, and producing conclusions not present in any individual report — not concatenation with headers.
@@ -257,6 +257,7 @@ Who this team member is and what they specialise in.
 ## What You Do
 - Specific tasks this member performs
 - Types of questions they can answer
+- (Use a domain-specific name if clearer, e.g., "What You Review" for reviewers)
 
 ## What You Do NOT Do
 - Explicit exclusions naming who else handles them
