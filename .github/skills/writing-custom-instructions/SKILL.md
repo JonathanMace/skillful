@@ -174,3 +174,40 @@ An authored instruction change is done when:
 7. **Commit and share** — repository instructions are version-controlled and shared across the team. Review changes to instructions like code changes.
 8. **Make instructions self-updating** — include an explicit rule like "If you discover a useful pattern or anti-pattern during this session, add it to this file immediately." This turns the instruction file into persistent cross-session memory that grows organically from real usage instead of letting hard-won discoveries die when a session ends.
 9. **Blacklist stale values, not just prescribe new ones** — when a configuration value, API version, pattern, or convention changes, add a line stating the old value must not appear (e.g., "OLD: `timeout=30` — MUST NOT be used; current value is `timeout=15`"). This prevents silent regression to outdated defaults that agents may encounter in existing code or training data.
+
+## Recommended: Anti-Patterns Section
+
+Maintain an explicit "Anti-Patterns" section in your `copilot-instructions.md` listing project-specific mistakes that have been made and must not be repeated. This serves as persistent cross-session memory for hard-won lessons.
+
+### Why This Works
+
+- Agents have no memory between sessions — without explicit warnings, they will repeat mistakes that previous sessions already discovered and fixed.
+- Positive rules ("do X") are necessary but insufficient — agents also need negative rules ("never do Y, because Z happened last time").
+- The self-updating instructions practice (Best Practice #8) naturally feeds this section: when you discover a new anti-pattern, add it immediately.
+
+### What to Include
+
+- **Stale values**: Old configuration values, API versions, or constants that must not reappear (complements Best Practice #9).
+- **Workflow mistakes**: Operations that seem reasonable but cause problems (e.g., "Don't push directly to main — it's branch-protected").
+- **Conceptual confusions**: Domain-specific traps where agents conflate similar concepts (e.g., "Don't confuse the staging API with production — they share hostnames but different ports").
+- **Tool misuse**: Commands or patterns that appear correct but fail in this project's context.
+
+### Example
+
+```markdown
+## Anti-Patterns (Learned the Hard Way)
+
+- Pushing directly to main (it's protected — always use PRs)
+- Using `timeout=30` anywhere (stale; current value is `timeout=15`)
+- Running migrations without backing up the dev database first
+- Confusing `UserID` (internal) with `ExternalID` (partner-facing) — they have the same format but different namespaces
+- Not deleting merged remote branches (they accumulate fast)
+- Inventing abstractions instead of shipping features (the Coffee Machine Rule)
+```
+
+### Maintenance
+
+- Add entries as mistakes are discovered — don't wait for a cleanup pass.
+- Include brief context ("because X happened") so future agents understand the rationale.
+- Periodically prune entries that no longer apply (e.g., after a migration is complete).
+- Keep the section near the end of the file — it's reference material, not primary guidance.
