@@ -234,9 +234,10 @@ If the task spans multiple areas, read the relevant guides in order.
 
 1. **Keep the dispatcher body short** — its job is routing, not teaching. A list of sub-topics with file references is enough.
 2. **Make routing unambiguous** — the agent should be able to pick the right file from the task description without guessing.
-3. **Deep content files follow the same structure as a SKILL.md body** — procedure, rules, examples, done criteria. They just lack frontmatter.
+3. **Deep content files follow the same structure as a SKILL.md body** — procedure, rules, examples, done criteria. They have YAML frontmatter with `title`, `summary`, and `trigger` fields (used by the dispatcher index) but are not discovered as standalone skills.
 4. **Use conditional routing when needed** — "If the project uses Python, read `guides/python.md`; if TypeScript, read `guides/typescript.md`."
 5. **Cross-reference freely** — deep content files can reference other files, scripts, templates, or even other skills.
+6. **Copy sub-file metadata verbatim into the dispatcher index** — give each deep content file a YAML frontmatter block with `title`, `summary`, and `trigger` fields. The dispatcher's index entry for each file must be a verbatim copy of that frontmatter, not a paraphrase. This ensures the dispatcher stays in sync with its content files and prevents drift. When updating a pattern, update the content file's frontmatter first, then copy the changes to the dispatcher.
 
 ## How Skills Are Invoked (Context for Authors)
 
