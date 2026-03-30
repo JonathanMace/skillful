@@ -1,3 +1,14 @@
+---
+title: Mentor Constellation with Referral Graph
+summary: >-
+  Read-only advisory agents forming a referral network — each knows its limits
+  and explicitly routes to the right specialist. Provides diverse perspectives
+  without any single agent trying to be everything.
+trigger: >-
+  Advisory support where users need guidance from different domains but
+  shouldn't have to know which specialist to ask.
+---
+
 # Mentor Constellation with Referral Graph
 
 ## What It Is

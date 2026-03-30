@@ -17,9 +17,15 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 
 ## Patterns
 
+<!-- Each entry below is a verbatim copy of the pattern file's frontmatter.
+     When adding or editing patterns, update the file's frontmatter first,
+     then copy it here exactly. The dispatcher is an index, not a paraphrase. -->
+
 ### Multi-Reviewer Panel
 
-N agents review the same artifact from non-overlapping perspectives, invoked in parallel. Each reviewer has a clear mandate and explicitly states what it does NOT review, eliminating redundancy while maximising coverage.
+> N agents review the same artifact from non-overlapping perspectives, invoked
+> in parallel. Each reviewer has a clear mandate and explicitly states what it
+> does NOT review, eliminating redundancy while maximising coverage.
 
 **When to use**: Quality gates for documents, code, designs, or any artifact that benefits from diverse expert scrutiny.
 
@@ -27,7 +33,9 @@ N agents review the same artifact from non-overlapping perspectives, invoked in 
 
 ### Mentor Constellation with Referral Graph
 
-A set of read-only advisory agents that form a referral network — each knows its limits and explicitly routes to the right specialist. Provides diverse perspectives without any single agent trying to be everything.
+> Read-only advisory agents forming a referral network — each knows its limits
+> and explicitly routes to the right specialist. Provides diverse perspectives
+> without any single agent trying to be everything.
 
 **When to use**: Advisory support where users need guidance from different domains but shouldn't have to know which specialist to ask.
 
@@ -35,7 +43,10 @@ A set of read-only advisory agents that form a referral network — each knows i
 
 ### Ritual Cadence
 
-A skill that enforces periodic maintenance and reflection ceremonies, preventing autonomous agent systems from drifting indefinitely without cleanup.
+> A skill that enforces periodic maintenance and reflection ceremonies,
+> preventing autonomous agent systems from drifting indefinitely without
+> cleanup. Divides long-running sessions into bounded cycles with structured
+> pauses.
 
 **When to use**: Long-running autonomous sessions where agents accumulate stale state, unfinished work, or strategic drift.
 

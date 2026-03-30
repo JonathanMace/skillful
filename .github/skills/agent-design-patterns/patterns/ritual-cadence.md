@@ -1,3 +1,15 @@
+---
+title: Ritual Cadence
+summary: >-
+  A skill that enforces periodic maintenance and reflection ceremonies,
+  preventing autonomous agent systems from drifting indefinitely without
+  cleanup. Divides long-running sessions into bounded cycles with structured
+  pauses.
+trigger: >-
+  Long-running autonomous sessions where agents accumulate stale state,
+  unfinished work, or strategic drift.
+---
+
 # Ritual Cadence
 
 ## What It Is

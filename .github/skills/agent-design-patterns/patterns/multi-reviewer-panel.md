@@ -1,3 +1,14 @@
+---
+title: Multi-Reviewer Panel
+summary: >-
+  N agents review the same artifact from non-overlapping perspectives, invoked
+  in parallel. Each reviewer has a clear mandate and explicitly states what it
+  does NOT review, eliminating redundancy while maximising coverage.
+trigger: >-
+  Quality gates for documents, code, designs, or any artifact that benefits
+  from diverse expert scrutiny.
+---
+
 # Multi-Reviewer Panel
 
 ## What It Is
