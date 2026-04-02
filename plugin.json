@@ -1,0 +1,18 @@
+{
+  "name": "skillful",
+  "description": "Copilot CLI skills for writing agents, skills, hooks, instructions, and managing git workflows — everything needed to build self-managing repositories.",
+  "version": "0.1.0",
+  "author": {
+    "name": "JonathanMace"
+  },
+  "repository": "https://github.com/JonathanMace/skillful",
+  "keywords": [
+    "copilot",
+    "skills",
+    "agents",
+    "hooks",
+    "instructions",
+    "git"
+  ],
+  "skills": "skills/"
+}
