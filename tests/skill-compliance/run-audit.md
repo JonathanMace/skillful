@@ -20,6 +20,7 @@ Read each `SKILL.md` file listed below:
 |-------|------|
 | git-checkpoint | `.github/skills/git-checkpoint/SKILL.md` |
 | session-analysis | `.github/skills/session-analysis/SKILL.md` |
+| writing-plugins | `skills/writing-plugins/SKILL.md` |
 | writing-custom-agents | `.github/skills/writing-custom-agents/SKILL.md` |
 | writing-custom-instructions | `.github/skills/writing-custom-instructions/SKILL.md` |
 | writing-hooks | `.github/skills/writing-hooks/SKILL.md` |

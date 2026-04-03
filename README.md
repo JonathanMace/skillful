@@ -25,6 +25,7 @@ copilot plugin list
 | Skill | What it does |
 |---|---|
 | **writing-skills** | Author reusable `SKILL.md` files that teach agents repeatable procedures and domain expertise. |
+| **writing-plugins** | Package reusable skills, agents, hooks, and integrations into an installable Copilot CLI plugin. |
 | **writing-custom-agents** | Author `.agent.md` profiles that give agents a focused role, model, and tool access — including orchestrating parallel subagents. |
 | **writing-custom-instructions** | Author instruction files that enforce coding standards and workflow rules across all Copilot sessions. |
 | **writing-hooks** | Author `hooks.json` files that run commands before or after agent actions for logging, guardrails, and automation. |
@@ -55,6 +56,8 @@ skillful/
     ├── session-analysis/              # Session retrospective analysis
     │   ├── SKILL.md
     │   └── scripts/session_analyzer.py
+    ├── writing-plugins/               # Author plugin.json-based CLI plugins
+    │   └── SKILL.md
     ├── writing-custom-agents/         # Author .agent.md files
     │   └── SKILL.md
     ├── writing-custom-instructions/   # Author copilot-instructions.md
@@ -67,4 +70,4 @@ skillful/
 
 ## Development
 
-The canonical source for each skill lives in `.github/skills/`. The `skills/` directory at the repo root is the plugin-distributable copy. When updating a skill, edit the `.github/skills/` version and copy it to `skills/`.
+Most reusable authoring skills have a canonical source in `.github/skills/`, and the `skills/` directory at the repo root is the plugin-distributable copy. Some skills are intentionally maintained only in `skills/` when they belong to the distributable plugin surface rather than the repository's mirrored internal skill set (for example, `bootstrap-skillful` and `writing-plugins`). When updating a mirrored skill, edit the `.github/skills/` version and copy it to `skills/`.
