@@ -2,6 +2,14 @@ This repository provides general-purpose Copilot CLI skills and agents that make
 
 The skills and agents here fill that gap. They are both **provided** (as reusable knowledge) and **used** (applied within this repo itself).
 
+## Self-Updating Instructions
+
+These instructions are your persistent memory across sessions. When you discover a useful design pattern, workflow improvement, or lesson learned during work, add it to this file immediately. If it's not written here, you will forget it.
+
+When you discover an anti-pattern to avoid, add it to this file immediately.
+
+This rule applies to itself: if you discover a better way to organize these instructions, update the structure.
+
 ## Repository Structure
 
 - `.github/skills/` — Agent skills, each in its own subdirectory with a `SKILL.md`
@@ -23,6 +31,14 @@ Multiple agents may be running concurrently in this repository. Each agent must 
 - **Branch ownership**: Each agent is responsible for maintaining and tidying its own branch — keep it rebased or up-to-date as needed.
 - **Default workflow**: When work is complete, agents should create a PR, squash-merge it, and delete both the local and remote branches afterward. Clean up the worktree when done.
 - The user can override this workflow (e.g., skip the PR, leave the branch open, etc.).
+
+Any subagents working on a dedicated coding task (i.e., working on an issue or creating a PR) must work in a dedicated git worktree. Follow the `git-checkpoint` skill for the full branch → worktree → commit → PR → merge → cleanup lifecycle.
+
+When work is complete:
+- Push and merge your own work via PR
+- Delete the remote branch after merge
+- Delete the local branch once merged
+- Remove the worktree
 
 ## Subagent Model Requirements
 
@@ -47,3 +63,11 @@ Before starting any task, check whether a relevant skill is available. Use `/ski
 ## Maintenance
 
 At the start of each session, check if any maintenance tasks are due by reading `.github/maintenance-state.md`. If the file doesn't exist or any tasks are overdue, invoke the `maintenance-runner` agent or follow the execution protocol in `.github/skills/maintenance-tasks/SKILL.md`.
+
+## README Maintenance
+
+Always keep the README up to date. When creating new reports, documents, or significant artifacts, check whether the README needs to be updated to reflect the changes.
+
+## Anti-Patterns
+
+<!-- Add anti-patterns here as you discover them. Include brief context so future agents understand the rationale. -->
