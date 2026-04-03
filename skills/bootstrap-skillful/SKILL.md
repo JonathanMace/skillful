@@ -172,21 +172,36 @@ This ensures:
 
 If the API call fails due to insufficient permissions, note it in the output and continue — these are non-blocking settings.
 
-### 8. Commit and Push
+### 8. Commit and Open a PR
 
-Commit all scaffolding changes in a single commit:
+All file changes from steps 2–5 should be committed together on a feature branch and submitted as a single pull request.
 
 ```bash
+git checkout -b bootstrap-skillful origin/main
 git add -A
 git commit -m "chore: bootstrap Copilot CLI infrastructure
 
 Add copilot-instructions.md, directory scaffolding, README, and AGENTS.md.
-Configure branch protection, squash-merge default, and auto-delete branches.
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+git push -u origin bootstrap-skillful
+gh pr create --title "Bootstrap skillful" --body "Set up Copilot CLI infrastructure:
+
+- Add .github/instructions/ and .github/hooks/ directory scaffolding
+- Create copilot-instructions.md (or merge missing rules into existing)
+- Create README.md (if missing)
+- Create AGENTS.md (if missing)
+
+Branch protection and merge settings are configured via API separately." --base main
 ```
 
-If branch protection is already active on the default branch, create a PR for these changes instead of pushing directly.
+Then squash-merge the PR and clean up:
+
+```bash
+gh pr merge --squash --delete-branch
+```
+
+**Note:** Steps 6 (branch protection) and 7 (merge settings) are API-only operations that don't produce file changes — they run independently and do not need to be part of the PR.
 
 ## Re-bootstrapping (Upgrading)
 
