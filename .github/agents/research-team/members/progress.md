@@ -1,19 +1,23 @@
 # Progress
 
 ## Current State
-- **Cycle**: 3
-- **Phase**: FINALISE
-- **Active work items**: Commit and create PR for 3 new design patterns
+- **Cycle**: 12 (Academic Literature Review — Cost-Aware Scheduling for LLM Agent Workflows)
+- **Phase**: DELIVER
+- **Active work items**: Synthesis delivered to user
 - **Completed work items**:
-  - Escalation Ladder pattern — drafted, reviewed (R1 + R2), revised, approved
-  - Blackboard (Shared Scratchpad) pattern — drafted, reviewed (R1 + R2), revised, approved
-  - Compensating Workflow (Saga) pattern — drafted, reviewed (R1 + R2), revised, approved
-  - SKILL.md dispatcher index updated with all 3 new patterns
+  - Cycles 1-11: Previous sessions (design patterns, CI/CD, plugin ecosystem, SDK, competitive analysis, verified code gen, multi-agent coordination, supply chain security)
+  - Cycle 12: 5 web researchers dispatched in parallel (all claude-opus-4.6)
+    - LLM cost optimization + model routing: COMPLETED — 64 tool calls, 1698s, 20 papers
+    - Cloud scheduling + resource planning: COMPLETED — 61 tool calls, 2181s, 21 papers  
+    - Query optimization analogies: COMPLETED — 63 tool calls, 2060s, 20 papers
+    - Token/prompt optimization: COMPLETED — 44 tool calls, 777s, 20 papers
+    - Recent 2024-2026 papers: COMPLETED — 60 tool calls, 2250s, 34 papers
+  - Total: ~90+ unique papers across 7 threads, deduplicated to ~85 in final synthesis
 - **Open questions**: None
-- **Original task**: Discover or invent new multi-agent design patterns for the agent-design-patterns skill. Patterns must be tested, reviewed (generalizability, testability, autonomy), iterated (2+ rounds), and validated. Aim for 2-3 excellent patterns.
-- **Session-local rules**: (none needed)
+- **Original task**: Deep academic literature review on cost-aware scheduling and resource optimization for LLM-based agent workflows
+- **Session-local rules**: 
+  - Always specify model explicitly (claude-opus-4.6 for deep analysis)
+  - Web search AI summaries may hallucinate — verify claims against primary sources
 
 ## Next Actions
-- Commit all changes to feature/new-design-patterns branch
-- Create PR targeting main
-- Squash-merge and clean up
+- Task complete

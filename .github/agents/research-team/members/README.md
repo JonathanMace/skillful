@@ -11,6 +11,8 @@ available team members, their categories, domains, and dispatch history.
 | Testability Reviewer | `testability-reviewer.md` | Review | Empirical validation and falsifiability | Artifact review panel | Initial setup |
 | Autonomy Reviewer | `autonomy-reviewer.md` | Review | Self-sufficiency and self-correction | Artifact review panel | Initial setup |
 | Pattern Writer | `pattern-writer.md` | Production | Multi-agent pattern documentation | New design patterns research | Cycle 1 |
+| Web Researcher | `web-researcher.md` | Production | Web research and competitive intelligence | Competitive analysis research | Cycle 3 |
+| Web Researcher | `web-researcher.md` | Production | Web research and evidence gathering | CI/CD automation research | Cycle 11 (supply chain lit review) |
 
 ## Archived Members
 
