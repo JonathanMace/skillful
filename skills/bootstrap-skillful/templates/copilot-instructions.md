@@ -32,6 +32,10 @@ This rule applies recursively — include it in subagent prompts so they also sp
 
 Always keep the README up to date. When creating new reports, documents, or significant artifacts, check whether the README needs to be updated to reflect the changes.
 
+## Build Artifacts
+
+Do not commit build artifacts, compiled output, or generated files. Before committing, review `git diff --staged` for files that should not be tracked (e.g., `node_modules/`, `dist/`, `__pycache__/`, `*.pyc`, `.class`, `.o`, `.exe`). If any appear, update `.gitignore` to exclude them and unstage them before committing.
+
 <!-- END SKILLFUL MANAGED SECTION -->
 
 ## Anti-Patterns
