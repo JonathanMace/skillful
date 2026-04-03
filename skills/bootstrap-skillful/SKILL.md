@@ -107,7 +107,29 @@ If no `AGENTS.md` exists at the repository root, create one using the template a
 
 If `AGENTS.md` already exists, leave it as-is.
 
-### 7. Protect the Default Branch
+### 7. Create `.gitignore` (if missing)
+
+If no `.gitignore` exists at the repository root, create one with sensible defaults for the project. Inspect the repository to determine the primary language/framework and generate appropriate ignore patterns. At minimum, include:
+
+```
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace
+```
+
+Add language-specific patterns based on what you find in the repo (e.g., `node_modules/` for Node.js, `__pycache__/` for Python, `bin/` and `obj/` for .NET).
+
+If a `.gitignore` already exists, leave it as-is.
+
+### 8. Protect the Default Branch
 
 Configure branch protection so that the default branch (typically `main`) only accepts changes via pull requests, with self-approval allowed.
 
@@ -177,7 +199,7 @@ gh api repos/{owner}/{repo}/branches/main/protection -X PUT --input <temp-file>
 
 **If branch protection already exists**, verify it matches the desired state. Do not weaken existing protections — only add the PR requirement if it is missing.
 
-### 8. Configure Repository Merge Settings
+### 9. Configure Repository Merge Settings
 
 Set the repository to default to **squash merging** and to **automatically delete head branches** after merge using this JSON body:
 
@@ -202,9 +224,9 @@ This ensures:
 
 If the API call fails due to insufficient permissions, note it in the output and continue — these are non-blocking settings.
 
-### 9. Commit and Open a PR
+### 10. Commit and Open a PR
 
-All file changes from steps 2–6 should be committed together on a feature branch and submitted as a single pull request.
+All file changes from steps 2–7 should be committed together on a feature branch and submitted as a single pull request.
 
 **Important — shell compatibility:** Do not pass multi-line strings or strings with special characters (backticks, quotes, angle brackets) directly on the command line. PowerShell and other shells mangle them. Instead, write message bodies to a temporary file and use file-based flags (`--body-file`, `--file`).
 
@@ -257,7 +279,7 @@ gh pr merge --squash --delete-branch
 
 Delete any temporary files after the PR is merged.
 
-**Note:** Steps 7 (branch protection) and 8 (merge settings) are API-only operations that don't produce file changes — they run independently and do not need to be part of the PR.
+**Note:** Steps 8 (branch protection) and 9 (merge settings) are API-only operations that don't produce file changes — they run independently and do not need to be part of the PR.
 
 ## Re-bootstrapping (Upgrading)
 
@@ -267,7 +289,7 @@ When re-running this skill on a previously bootstrapped repo:
 - **Project header**: exists → skip (Step 3)
 - **copilot-instructions.md managed section**: has guard comments → replace in place (Step 4); no guard comments → append template
 - **Anti-Patterns section**: preserved outside managed markers — never overwritten
-- **README.md / AGENTS.md**: exist → skip
+- **README.md / AGENTS.md / .gitignore**: exist → skip
 - **Branch protection**: exists → verify, don't weaken
 - **Merge settings**: re-applied (idempotent API call)
 
@@ -276,7 +298,8 @@ The skill is designed to be safe to re-run at any time.
 ## Done Criteria
 
 - [ ] `.github/agents/`, `.github/skills/`, `.github/instructions/`, `.github/hooks/` all exist
-- [ ] `.github/copilot-instructions.md` exists and contains all four core rules
+- [ ] `.github/copilot-instructions.md` exists and contains all four core rules plus build artifact rule
+- [ ] `.gitignore` exists at the repo root
 - [ ] `README.md` exists at the repo root
 - [ ] `AGENTS.md` exists at the repo root
 - [ ] Default branch requires PRs (no direct pushes)
