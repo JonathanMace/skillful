@@ -146,7 +146,32 @@ EOF
 
 **If branch protection already exists**, verify it matches the desired state. Do not weaken existing protections — only add the PR requirement if it is missing.
 
-### 7. Commit and Push
+### 7. Configure Repository Merge Settings
+
+Set the repository to default to **squash merging** and to **automatically delete head branches** after merge:
+
+```bash
+gh api repos/{owner}/{repo} -X PATCH --input - <<'EOF'
+{
+  "allow_squash_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "squash_merge_commit_title": "PR_TITLE",
+  "squash_merge_commit_message": "PR_BODY",
+  "delete_branch_on_merge": true
+}
+EOF
+```
+
+This ensures:
+
+- **Squash merge** is available and produces clean single-commit history
+- Other merge strategies remain available (the user can disable them later)
+- **Head branches are automatically deleted** after merging a PR, preventing stale branch accumulation
+
+If the API call fails due to insufficient permissions, note it in the output and continue — these are non-blocking settings.
+
+### 8. Commit and Push
 
 Commit all scaffolding changes in a single commit:
 
@@ -155,7 +180,7 @@ git add -A
 git commit -m "chore: bootstrap Copilot CLI infrastructure
 
 Add copilot-instructions.md, directory scaffolding, README, and AGENTS.md.
-Configure branch protection to require PRs with self-approval.
+Configure branch protection, squash-merge default, and auto-delete branches.
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 ```
@@ -170,6 +195,7 @@ When re-running this skill on a previously bootstrapped repo:
 - **copilot-instructions.md**: exists → merge missing rules only (Step 3)
 - **README.md / AGENTS.md**: exist → skip
 - **Branch protection**: exists → verify, don't weaken
+- **Merge settings**: re-applied (idempotent API call)
 
 The skill is designed to be safe to re-run at any time.
 
@@ -181,4 +207,6 @@ The skill is designed to be safe to re-run at any time.
 - [ ] `AGENTS.md` exists at the repo root
 - [ ] Default branch requires PRs (no direct pushes)
 - [ ] Self-approval is allowed (0 required approving reviews)
+- [ ] Repository defaults to squash merge with PR title/body
+- [ ] Head branches are automatically deleted after merge
 - [ ] All changes are committed and pushed (or in a PR if branch protection is active)
