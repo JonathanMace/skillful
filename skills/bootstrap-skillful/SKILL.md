@@ -122,14 +122,15 @@ Configure branch protection so that the default branch (typically `main`) only a
 
 First, check if a ruleset already protects the default branch:
 
-```bash
+```
 gh api repos/{owner}/{repo}/rulesets
 ```
 
-If no ruleset covers the default branch, create one:
+If no ruleset covers the default branch, create one. Write the JSON body to a temporary file, pass it to `gh api`, then delete the file:
 
-```bash
-gh api repos/{owner}/{repo}/rulesets -X POST --input - <<'EOF'
+```
+# Write the ruleset JSON to a temp file
+# (Use your shell's temp-file mechanism — the JSON content is what matters)
 {
   "name": "Protect default branch",
   "target": "branch",
@@ -153,15 +154,15 @@ gh api repos/{owner}/{repo}/rulesets -X POST --input - <<'EOF'
     }
   ]
 }
-EOF
+
+gh api repos/{owner}/{repo}/rulesets -X POST --input <temp-file>
 ```
 
 Replace `main` with the actual default branch name if different.
 
-If the rulesets API is unavailable (e.g., older GitHub plan), fall back to classic branch protection:
+If the rulesets API is unavailable (e.g., older GitHub plan), fall back to classic branch protection using this JSON body:
 
-```bash
-gh api repos/{owner}/{repo}/branches/main/protection -X PUT --input - <<'EOF'
+```
 {
   "required_status_checks": null,
   "enforce_admins": false,
@@ -170,17 +171,17 @@ gh api repos/{owner}/{repo}/branches/main/protection -X PUT --input - <<'EOF'
   },
   "restrictions": null
 }
-EOF
+
+gh api repos/{owner}/{repo}/branches/main/protection -X PUT --input <temp-file>
 ```
 
 **If branch protection already exists**, verify it matches the desired state. Do not weaken existing protections — only add the PR requirement if it is missing.
 
 ### 8. Configure Repository Merge Settings
 
-Set the repository to default to **squash merging** and to **automatically delete head branches** after merge:
+Set the repository to default to **squash merging** and to **automatically delete head branches** after merge using this JSON body:
 
-```bash
-gh api repos/{owner}/{repo} -X PATCH --input - <<'EOF'
+```
 {
   "allow_squash_merge": true,
   "allow_merge_commit": true,
@@ -189,7 +190,8 @@ gh api repos/{owner}/{repo} -X PATCH --input - <<'EOF'
   "squash_merge_commit_message": "PR_BODY",
   "delete_branch_on_merge": true
 }
-EOF
+
+gh api repos/{owner}/{repo} -X PATCH --input <temp-file>
 ```
 
 This ensures:
@@ -204,30 +206,56 @@ If the API call fails due to insufficient permissions, note it in the output and
 
 All file changes from steps 2–6 should be committed together on a feature branch and submitted as a single pull request.
 
-```bash
+**Important — shell compatibility:** Do not pass multi-line strings or strings with special characters (backticks, quotes, angle brackets) directly on the command line. PowerShell and other shells mangle them. Instead, write message bodies to a temporary file and use file-based flags (`--body-file`, `--file`).
+
+```
 git checkout -b bootstrap-skillful origin/main
 git add -A
-git commit -m "chore: bootstrap Copilot CLI infrastructure
+```
+
+Write the commit message to a temp file, then commit using `--file`:
+
+```
+git commit --file <temp-commit-msg-file>
+```
+
+Commit message contents:
+
+```
+chore: bootstrap Copilot CLI infrastructure
 
 Add copilot-instructions.md, directory scaffolding, README, and AGENTS.md.
 
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
+
+Push and create the PR using `--body-file`:
+
+```
 git push -u origin bootstrap-skillful
-gh pr create --title "Bootstrap skillful" --body "Set up Copilot CLI infrastructure:
+gh pr create --title "Bootstrap skillful" --body-file <temp-pr-body-file> --base main
+```
 
-- Add .github/instructions/ and .github/hooks/ directory scaffolding
-- Create copilot-instructions.md (or merge missing rules into existing)
-- Create README.md (if missing)
-- Create AGENTS.md (if missing)
+PR body contents:
 
-Branch protection and merge settings are configured via API separately." --base main
+```
+Set up Copilot CLI infrastructure:
+
+- Directory scaffolding (.github/agents, skills, instructions, hooks)
+- copilot-instructions.md with managed rules
+- README.md (if missing)
+- AGENTS.md (if missing)
+
+Branch protection and merge settings are configured via API separately.
 ```
 
 Then squash-merge the PR and clean up:
 
-```bash
+```
 gh pr merge --squash --delete-branch
 ```
+
+Delete any temporary files after the PR is merged.
 
 **Note:** Steps 7 (branch protection) and 8 (merge settings) are API-only operations that don't produce file changes — they run independently and do not need to be part of the PR.
 
