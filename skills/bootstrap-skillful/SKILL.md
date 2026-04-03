@@ -47,22 +47,50 @@ These directories enable Copilot CLI's customization mechanisms:
 
 Add a `.gitkeep` file to each empty directory so Git tracks them.
 
-### 3. Create or Update `copilot-instructions.md`
+### 3. Add Project Header to `copilot-instructions.md`
+
+If `.github/copilot-instructions.md` does not exist, or exists but does not start with a project title and description, add a header at the top of the file:
+
+```markdown
+# <project name>
+
+<one-line description of what the project does>
+```
+
+Derive the project name from the repository name and the description from the repo's GitHub description (or a sensible default). If the file already starts with a heading and description, leave them as-is.
+
+### 4. Create or Update Skillful Rules in `copilot-instructions.md`
+
+The template at `templates/copilot-instructions.md` (relative to this skill's directory) contains the managed rules wrapped in guard comments:
+
+```html
+<!-- BEGIN SKILLFUL MANAGED SECTION -->
+...rules...
+<!-- END SKILLFUL MANAGED SECTION -->
+```
 
 **If `.github/copilot-instructions.md` does not exist:**
 
-Create it using the template at `templates/copilot-instructions.md` (relative to this skill's directory). Replace the `{project_name}` and `{project_description}` placeholders with values appropriate for the repository.
+Create it with the project header from Step 3 followed by the full template contents.
 
-**If `.github/copilot-instructions.md` already exists:**
+**If the file exists but has no guard comments:**
 
-Compare the existing file against the template. Ensure each of the following rules is present. If any are missing, append them under the appropriate heading. Do **not** remove or rewrite existing content — merge carefully:
+This means it was created manually or by an older version of skillful. Append the full template contents (including guard comments) after the existing content. Do **not** remove or rewrite existing content.
+
+**If the file exists and already has guard comments:**
+
+Replace everything between `<!-- BEGIN SKILLFUL MANAGED SECTION -->` and `<!-- END SKILLFUL MANAGED SECTION -->` (inclusive) with the current template contents. This upgrades the managed rules in place while preserving all user-authored content outside the markers.
+
+The managed section contains these four rules:
 
 1. **Self-Updating Instructions** — agents must add discovered patterns and anti-patterns to this file immediately
 2. **Work Tracking** — subagents doing coding tasks must use dedicated git worktrees via the `git-checkpoint` skill
 3. **Subagent Model Specification** — always specify the model when spawning subagents
 4. **README Maintenance** — keep the README up to date when creating new artifacts
 
-### 4. Create `README.md` (if missing)
+The **Anti-Patterns** section lives outside the managed markers (after them) so user-added entries are never overwritten. If no Anti-Patterns section exists, append one after the closing marker.
+
+### 5. Create `README.md` (if missing)
 
 If no `README.md` exists at the repository root, create one with:
 
@@ -73,13 +101,13 @@ If no `README.md` exists at the repository root, create one with:
 
 If a `README.md` already exists, leave it as-is.
 
-### 5. Create `AGENTS.md` (if missing)
+### 6. Create `AGENTS.md` (if missing)
 
 If no `AGENTS.md` exists at the repository root, create one using the template at `templates/AGENTS.md` (relative to this skill's directory). Customize the placeholders based on the repository.
 
 If `AGENTS.md` already exists, leave it as-is.
 
-### 6. Protect the Default Branch
+### 7. Protect the Default Branch
 
 Configure branch protection so that the default branch (typically `main`) only accepts changes via pull requests, with self-approval allowed.
 
@@ -147,7 +175,7 @@ EOF
 
 **If branch protection already exists**, verify it matches the desired state. Do not weaken existing protections — only add the PR requirement if it is missing.
 
-### 7. Configure Repository Merge Settings
+### 8. Configure Repository Merge Settings
 
 Set the repository to default to **squash merging** and to **automatically delete head branches** after merge:
 
@@ -172,9 +200,9 @@ This ensures:
 
 If the API call fails due to insufficient permissions, note it in the output and continue — these are non-blocking settings.
 
-### 8. Commit and Open a PR
+### 9. Commit and Open a PR
 
-All file changes from steps 2–5 should be committed together on a feature branch and submitted as a single pull request.
+All file changes from steps 2–6 should be committed together on a feature branch and submitted as a single pull request.
 
 ```bash
 git checkout -b bootstrap-skillful origin/main
@@ -201,14 +229,16 @@ Then squash-merge the PR and clean up:
 gh pr merge --squash --delete-branch
 ```
 
-**Note:** Steps 6 (branch protection) and 7 (merge settings) are API-only operations that don't produce file changes — they run independently and do not need to be part of the PR.
+**Note:** Steps 7 (branch protection) and 8 (merge settings) are API-only operations that don't produce file changes — they run independently and do not need to be part of the PR.
 
 ## Re-bootstrapping (Upgrading)
 
 When re-running this skill on a previously bootstrapped repo:
 
 - **Directories**: already exist → skip
-- **copilot-instructions.md**: exists → merge missing rules only (Step 3)
+- **Project header**: exists → skip (Step 3)
+- **copilot-instructions.md managed section**: has guard comments → replace in place (Step 4); no guard comments → append template
+- **Anti-Patterns section**: preserved outside managed markers — never overwritten
 - **README.md / AGENTS.md**: exist → skip
 - **Branch protection**: exists → verify, don't weaken
 - **Merge settings**: re-applied (idempotent API call)
