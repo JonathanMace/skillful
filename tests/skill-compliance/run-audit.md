@@ -18,14 +18,19 @@ Read each `SKILL.md` file listed below:
 
 | Skill | Path |
 |-------|------|
-| git-checkpoint | `.github/skills/git-checkpoint/SKILL.md` |
+| agent-design-patterns | `skills/agent-design-patterns/SKILL.md` |
+| bootstrap-skillful | `skills/bootstrap-skillful/SKILL.md` |
+| create-persona | `skills/create-persona/SKILL.md` |
+| git-checkpoint | `skills/git-checkpoint/SKILL.md` |
 | latex-report | `skills/latex-report/SKILL.md` |
-| session-analysis | `.github/skills/session-analysis/SKILL.md` |
+| related-work | `skills/related-work/SKILL.md` |
+| review-document | `skills/review-document/SKILL.md` |
+| session-analysis | `skills/session-analysis/SKILL.md` |
 | writing-plugins | `skills/writing-plugins/SKILL.md` |
-| writing-custom-agents | `.github/skills/writing-custom-agents/SKILL.md` |
-| writing-custom-instructions | `.github/skills/writing-custom-instructions/SKILL.md` |
-| writing-hooks | `.github/skills/writing-hooks/SKILL.md` |
-| writing-skills | `.github/skills/writing-skills/SKILL.md` |
+| writing-custom-agents | `skills/writing-custom-agents/SKILL.md` |
+| writing-custom-instructions | `skills/writing-custom-instructions/SKILL.md` |
+| writing-hooks | `skills/writing-hooks/SKILL.md` |
+| writing-skills | `skills/writing-skills/SKILL.md` |
 
 ### Step 3: Evaluate Each Skill
 

@@ -1,6 +1,6 @@
 # Skill Test Framework
 
-This directory contains a structured, repeatable test framework for validating skills in this repository. Tests verify that skills adhere to the rules defined in the [`writing-skills` skill](../.github/skills/writing-skills/SKILL.md).
+This directory contains a structured, repeatable test framework for validating skills in this repository. Tests verify that skills adhere to the rules defined in the [`writing-skills` skill](../skills/writing-skills/SKILL.md).
 
 ## Test Categories
 

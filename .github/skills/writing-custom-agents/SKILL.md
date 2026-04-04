@@ -263,7 +263,7 @@ This is the agent-side analog of the dispatcher pattern for skills (see the `wri
 | Placement | Path | Best when |
 |-----------|------|-----------|
 | **Co-located with parent** | `.github/agents/<parent-name>/` | Instructions are tightly coupled to one parent agent |
-| **Inside a skill directory** | `.github/skills/<skill>/subagents/` | A skill needs to spawn subagents as part of its procedure |
+| **Inside a skill directory** | `skills/<skill>/subagents/` | A plugin-distributed skill needs to spawn subagents as part of its procedure |
 | **Dedicated directory** | `.github/subagents/` | Multiple parents share the same instruction files |
 
 ### Parent Agent Example
