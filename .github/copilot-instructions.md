@@ -18,9 +18,9 @@ This rule applies to itself: if you discover a better way to organize these inst
 
 ## Work Tracking
 
-Any subagents working on a dedicated coding task (i.e., working on an issue or creating a PR) must work in a dedicated git worktree. Follow the `git-checkpoint` skill for the full branch → worktree → commit → PR → merge → cleanup lifecycle.
+All agents or subagents that edit files must work in a dedicated git worktree. Follow the `git-checkpoint` skill for the full branch → worktree → commit → PR → merge → cleanup lifecycle.
 
-When work is complete:
+All work must be committed and merged after editing, unless instructed otherwise.
 - Push and merge your own work via PR
 - Delete the remote branch after merge
 - Delete the local branch once merged
