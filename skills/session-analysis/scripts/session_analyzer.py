@@ -569,12 +569,19 @@ class AncestryIndex(Collector):
     def __init__(self):
         self.parent_map: dict[str, str] = {}
         self.task_args: dict[str, dict] = {}
-        self.task_call_eids: dict[str, str] = {}  # toolCallId -> event_id of task tool call
+        self.task_call_eids: dict[str, str] = {}
         self.subagent_starts: dict[str, dict] = {}
         self.subagent_start_by_tcid: dict[str, str] = {}
         self.subagent_completions: dict[str, dict] = {}
+        self.subagent_complete_eid_to_tcid: dict[str, str] = {}
         self._resolve_cache: dict[str, Optional[tuple[str, str]]] = {}
         self._children_map: Optional[dict[str, list[str]]] = None
+        # Sequence-based tracking for span resolution
+        self._seq: int = 0
+        self.event_seq: dict[str, int] = {}
+        self.sa_start_seq: dict[str, int] = {}
+        self.sa_end_seq: dict[str, int] = {}
+        self._spans_sorted: Optional[list[tuple[int, int, str]]] = None
 
     def wants_all(self) -> bool:
         return True
@@ -587,6 +594,8 @@ class AncestryIndex(Collector):
         pid = evt.get("parentId", "")
         if eid:
             self.parent_map[eid] = pid
+            self.event_seq[eid] = self._seq
+            self._seq += 1
 
         etype = evt.get("type", "")
         data = evt.get("data", {})
@@ -603,40 +612,61 @@ class AncestryIndex(Collector):
                 self.subagent_starts[eid] = data
                 if tcid:
                     self.subagent_start_by_tcid[tcid] = eid
+                    self.sa_start_seq[tcid] = self.event_seq.get(eid, 0)
         elif etype == "subagent.completed":
             tcid = data.get("toolCallId", "")
             if tcid:
                 self.subagent_completions[tcid] = data
+                if eid:
+                    self.subagent_complete_eid_to_tcid[eid] = tcid
+                    self.sa_end_seq[tcid] = self.event_seq.get(eid, 0)
+
+    def _build_spans(self) -> None:
+        """Build sorted list of subagent spans for efficient lookup."""
+        if self._spans_sorted is not None:
+            return
+        self._spans_sorted = []
+        for tcid in self.sa_start_seq:
+            start = self.sa_start_seq[tcid]
+            end = self.sa_end_seq.get(tcid, self._seq)
+            self._spans_sorted.append((start, end, tcid))
+        self._spans_sorted.sort(key=lambda x: x[0])
 
     def resolve_subagent(self, event_id: str) -> Optional[tuple[str, str]]:
-        """Walk parentId chain to nearest subagent.started.
-        Returns (task_name, toolCallId) or None for root-level events."""
+        """Find the innermost active subagent at this event's position.
+
+        Uses span-based resolution: each subagent has a span from its
+        subagent.started to its subagent.completed. The innermost
+        (most recently started) active span wins.
+        """
         if event_id in self._resolve_cache:
             return self._resolve_cache[event_id]
 
-        visited: list[str] = []
-        current = event_id
+        self._build_spans()
+        seq = self.event_seq.get(event_id)
+        if seq is None:
+            return None
+
+        best_tcid = None
+        best_start = -1
+        for start, end, tcid in self._spans_sorted:
+            if start > seq:
+                break
+            if start <= seq <= end and start > best_start:
+                best_tcid = tcid
+                best_start = start
+
         result = None
+        if best_tcid:
+            name = self.task_args.get(best_tcid, {}).get(
+                "name",
+                self.subagent_starts.get(
+                    self.subagent_start_by_tcid.get(best_tcid, ""), {}
+                ).get("agentName", "?"),
+            )
+            result = (name, best_tcid)
 
-        while current:
-            if current in self._resolve_cache:
-                result = self._resolve_cache[current]
-                break
-            visited.append(current)
-            if current in self.subagent_starts:
-                data = self.subagent_starts[current]
-                tcid = data.get("toolCallId", "")
-                name = self.task_args.get(tcid, {}).get(
-                    "name", data.get("agentName", "?")
-                )
-                result = (name, tcid)
-                break
-            current = self.parent_map.get(current, "")
-            if not current:
-                break
-
-        for v in visited:
-            self._resolve_cache[v] = result
+        self._resolve_cache[event_id] = result
         return result
 
     def resolve_parent_subagent(
@@ -645,20 +675,43 @@ class AncestryIndex(Collector):
         """For a subagent.started event, find the parent subagent (if any).
 
         Uses the tool.execution_start event that spawned this subagent
-        to determine the correct parent context, avoiding sibling
-        subagent.started events in the parentId chain.
+        to determine the correct parent context via span resolution.
         """
         data = self.subagent_starts.get(subagent_event_id, {})
         tcid = data.get("toolCallId", "")
         if not tcid:
             return None
 
-        # Find the tool.execution_start that called the task tool
         task_eid = self.task_call_eids.get(tcid, "")
         if not task_eid:
             return None
 
-        return self.resolve_subagent(task_eid)
+        # Temporarily exclude this subagent's own span to find parent
+        task_seq = self.event_seq.get(task_eid)
+        if task_seq is None:
+            return None
+
+        self._build_spans()
+        best_tcid = None
+        best_start = -1
+        for start, end, span_tcid in self._spans_sorted:
+            if span_tcid == tcid:
+                continue
+            if start > task_seq:
+                break
+            if start <= task_seq <= end and start > best_start:
+                best_tcid = span_tcid
+                best_start = start
+
+        if best_tcid:
+            name = self.task_args.get(best_tcid, {}).get(
+                "name",
+                self.subagent_starts.get(
+                    self.subagent_start_by_tcid.get(best_tcid, ""), {}
+                ).get("agentName", "?"),
+            )
+            return (name, best_tcid)
+        return None
 
     def _build_children_map(self) -> None:
         if self._children_map is not None:
@@ -809,6 +862,24 @@ def _fmt_tokens(n: int) -> str:
 # V2 Output Formatters
 # ---------------------------------------------------------------------------
 
+def _get_subagent_family(
+    ancestry: AncestryIndex, target_tcid: str
+) -> set[str]:
+    """Get set of toolCallIds for target subagent and all descendants."""
+    family: set[str] = {target_tcid}
+    queue = [target_tcid]
+    while queue:
+        current_tcid = queue.pop()
+        for tcid, eid in ancestry.subagent_start_by_tcid.items():
+            if tcid in family:
+                continue
+            parent_info = ancestry.resolve_parent_subagent(eid)
+            if parent_info and parent_info[1] == current_tcid:
+                family.add(tcid)
+                queue.append(tcid)
+    return family
+
+
 def _output_subagent_transcript(
     name: str,
     ancestry: AncestryIndex,
@@ -830,8 +901,15 @@ def _output_subagent_transcript(
         print(f"No subagent.started event found for '{name}'")
         return
 
-    descendants = ancestry.descendants_of(sa_eid)
-    descendants.add(sa_eid)
+    # Build family of subagent toolCallIds (target + all nested subagents)
+    family_tcids = _get_subagent_family(ancestry, tcid)
+
+    # Build sequence spans for family members
+    family_spans: list[tuple[int, int]] = []
+    for ftcid in family_tcids:
+        start = ancestry.sa_start_seq.get(ftcid, 0)
+        end = ancestry.sa_end_seq.get(ftcid, ancestry._seq)
+        family_spans.append((start, end))
 
     relevant_types = {
         "assistant.message",
@@ -842,11 +920,18 @@ def _output_subagent_transcript(
         "user.message",
     }
 
-    transcript = [
-        evt
-        for evt in store.events
-        if evt.get("id", "") in descendants and evt.get("type") in relevant_types
-    ]
+    transcript = []
+    for evt in store.events:
+        if evt.get("type") not in relevant_types:
+            continue
+        eid = evt.get("id", "")
+        seq = ancestry.event_seq.get(eid)
+        if seq is None:
+            continue
+        # Check if event falls within any family span
+        in_family = any(start <= seq <= end for start, end in family_spans)
+        if in_family:
+            transcript.append(evt)
 
     print(f"\nSUBAGENT TRANSCRIPT: {name} ({len(transcript)} events)")
     print("=" * 80)
@@ -1372,10 +1457,11 @@ def _output_enhanced_timeline(
         if etype == "subagent.started":
             depth = max(0, depth - 1)
             sa_name = _resolve_task_name_for_event(eid, ancestry)
-            label = f"▶ START {sa_name}"
+            label = f"START {sa_name}"
         elif etype == "subagent.completed":
+            depth = max(0, depth - 1)
             sa_name = _resolve_task_name_for_completed(eid, ancestry)
-            label = f"■ DONE  {summary}" if not sa_name else f"■ DONE  {sa_name}"
+            label = f"DONE {summary}" if not sa_name else f"DONE {sa_name}"
         else:
             label = summary
 
@@ -1398,23 +1484,22 @@ def _resolve_task_name_for_event(eid: str, ancestry: AncestryIndex) -> str:
 
 def _resolve_task_name_for_completed(eid: str, ancestry: AncestryIndex) -> str:
     """Resolve the task name for a subagent.completed event."""
-    # Walk parentId chain to find which subagent this completion belongs to
-    resolved = ancestry.resolve_subagent(eid)
-    if resolved:
-        name = resolved[0]
-        tcid = resolved[1]
-        comp = ancestry.subagent_completions.get(tcid, {})
-        model = comp.get("model", "")
-        dur_ms = comp.get("durationMs", 0)
-        dur_str = _fmt_duration(dur_ms / 1000) if dur_ms else "?"
-        tokens = comp.get("totalTokens", "?")
-        parts = [name]
-        if model:
-            parts.append(model)
-        parts.append(dur_str)
-        parts.append(f"{tokens} tok")
-        return f"{name} ({', '.join(parts[1:])})"
-    return ""
+    tcid = ancestry.subagent_complete_eid_to_tcid.get(eid, "")
+    if not tcid:
+        return ""
+    args = ancestry.task_args.get(tcid, {})
+    comp = ancestry.subagent_completions.get(tcid, {})
+    name = args.get("name", comp.get("agentName", "?"))
+    model = comp.get("model", "")
+    dur_ms = comp.get("durationMs", 0)
+    dur_str = _fmt_duration(dur_ms / 1000) if dur_ms else "?"
+    tokens = comp.get("totalTokens", "?")
+    parts = []
+    if model:
+        parts.append(model)
+    parts.append(dur_str)
+    parts.append(f"{tokens} tok")
+    return f"{name} ({', '.join(parts)})"
 
 
 # ---------------------------------------------------------------------------
