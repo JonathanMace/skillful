@@ -20,6 +20,7 @@ Read each `SKILL.md` file listed below:
 |-------|------|
 | agent-design-patterns | `skills/agent-design-patterns/SKILL.md` |
 | bootstrap-skillful | `skills/bootstrap-skillful/SKILL.md` |
+| convert-documents-to-markdown | `skills/convert-documents-to-markdown/SKILL.md` |
 | create-persona | `skills/create-persona/SKILL.md` |
 | git-checkpoint | `skills/git-checkpoint/SKILL.md` |
 | latex-report | `skills/latex-report/SKILL.md` |
