@@ -38,8 +38,18 @@ Copilot CLI records every event in a session to `~/.copilot/session-state/<sessi
 
 ## Prerequisites
 
-- Python 3.9+ (uses only stdlib — no dependencies)
+- Python 3.9+
 - Access to the session's `events.jsonl` file
+
+### Optional Dependencies
+
+The analyzer works with only the Python standard library. For faster analysis of large logs (100MB+), install optional dependencies:
+
+```
+pip install -r scripts/requirements.txt
+```
+
+This installs [orjson](https://github.com/ijl/orjson), which provides 3–5x faster JSON parsing. The script detects orjson at import time and falls back to stdlib `json` transparently.
 
 ## Procedure: Analyzing a Session
 
