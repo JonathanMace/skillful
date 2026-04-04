@@ -4,6 +4,12 @@
 Designed for large files (100+ MB). Uses a single-pass collector
 architecture — the file is read once and each event is dispatched
 to all active collectors simultaneously.
+
+Install optional dependencies for faster analysis of large logs::
+
+    pip install -r requirements.txt   # (from the scripts/ directory)
+
+The script works without them — stdlib ``json`` is used as a fallback.
 """
 from __future__ import annotations
 
@@ -17,6 +23,21 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Generator, Optional
+
+# ---------------------------------------------------------------------------
+# Optional fast JSON backend — falls back to stdlib json transparently.
+# Install with:  pip install orjson
+# ---------------------------------------------------------------------------
+try:
+    import orjson
+
+    _loads = orjson.loads  # accepts both str and bytes
+    _dumps = lambda obj, **kw: orjson.dumps(obj).decode("utf-8")
+    _HAS_ORJSON = True
+except ImportError:
+    _loads = json.loads
+    _dumps = lambda obj, **kw: json.dumps(obj, ensure_ascii=True)
+    _HAS_ORJSON = False
 
 # Default session log path
 DEFAULT_PATH = (
@@ -869,7 +890,7 @@ def _output_subagent_transcript(
         elif etype == "tool.execution_start":
             tool = data.get("toolName", "?")
             args = data.get("arguments", {})
-            args_str = json.dumps(args, ensure_ascii=True)[:200]
+            args_str = _dumps(args)[:200]
             print(f"\n  [{ts}] TOOL CALL: {tool}")
             print(f"    Args: {args_str}")
 
@@ -930,7 +951,7 @@ def _output_search_tools(
             continue
 
         args = data.get("arguments", {})
-        args_str = json.dumps(args, ensure_ascii=True)
+        args_str = _dumps(args)
 
         complete_evt = completes.get(tcid, {})
         result_data = complete_evt.get("data", {}).get("result", {})
@@ -1047,7 +1068,7 @@ def _output_search(
             searchable = data.get("content", "")
         elif etype == "tool.execution_start":
             args = data.get("arguments", {})
-            searchable = json.dumps(args, ensure_ascii=True)
+            searchable = _dumps(args)
         elif etype == "tool.execution_complete":
             result = data.get("result", {})
             searchable = (
@@ -1056,9 +1077,9 @@ def _output_search(
                 else str(result)
             )
         elif etype == "subagent.completed":
-            searchable = json.dumps(data, ensure_ascii=True)
+            searchable = _dumps(data)
         else:
-            searchable = json.dumps(data, ensure_ascii=True)
+            searchable = _dumps(data)
 
         m = pattern.search(searchable)
         if m:
@@ -1156,7 +1177,7 @@ def _output_trace_claim(
         elif etype == "tool.execution_start":
             tool = data.get("toolName", "")
             args = data.get("arguments", {})
-            searchable = json.dumps(args, ensure_ascii=True)
+            searchable = _dumps(args)
             source_desc = f"tool call ({tool})"
         elif etype == "tool.execution_complete":
             result = data.get("result", {})
@@ -1438,14 +1459,19 @@ def run_collectors(
         for t in c.wanted_types():
             type_dispatch[t].append(c)
 
-    with open(path, encoding="utf-8") as fh:
+    if _HAS_ORJSON:
+        fh = open(path, "rb", buffering=1_048_576)
+    else:
+        fh = open(path, encoding="utf-8", buffering=1_048_576)
+
+    try:
         for lineno, line in enumerate(fh, 1):
-            line = line.strip()
-            if not line:
+            stripped = line.strip() if isinstance(line, str) else line.strip()
+            if not stripped:
                 continue
             try:
-                evt = json.loads(line)
-            except json.JSONDecodeError:
+                evt = _loads(stripped)
+            except (json.JSONDecodeError, ValueError):
                 print(f"[WARN] Malformed JSON on line {lineno}, skipping", file=sys.stderr)
                 continue
 
@@ -1457,6 +1483,8 @@ def run_collectors(
             if etype in type_dispatch:
                 for c in type_dispatch[etype]:
                     c.process(evt)
+    finally:
+        fh.close()
 
 
 # ---------------------------------------------------------------------------
@@ -1470,18 +1498,24 @@ def iter_events(
     """Yield events one at a time from *path*, optionally filtering by type."""
     if isinstance(type_filter, str):
         type_filter = {type_filter}
-    with open(path, encoding="utf-8") as fh:
+    if _HAS_ORJSON:
+        fh = open(path, "rb", buffering=1_048_576)
+    else:
+        fh = open(path, encoding="utf-8", buffering=1_048_576)
+    try:
         for lineno, line in enumerate(fh, 1):
-            line = line.strip()
-            if not line:
+            stripped = line.strip() if isinstance(line, str) else line.strip()
+            if not stripped:
                 continue
             try:
-                evt = json.loads(line)
-            except json.JSONDecodeError:
+                evt = _loads(stripped)
+            except (json.JSONDecodeError, ValueError):
                 print(f"[WARN] Malformed JSON on line {lineno}, skipping", file=sys.stderr)
                 continue
             if type_filter is None or evt.get("type") in type_filter:
                 yield evt
+    finally:
+        fh.close()
 
 
 def extract_timeline(path: str | Path) -> list[tuple[str, str, str]]:

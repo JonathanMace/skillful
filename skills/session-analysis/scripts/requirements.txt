@@ -1,0 +1,6 @@
+# Optional dependencies for faster session analysis.
+# Install with:  pip install -r requirements.txt
+#
+# The analyzer works without these — stdlib json is used as a fallback.
+# On large logs (100MB+), orjson provides 3-5x faster JSON parsing.
+orjson>=3.9
