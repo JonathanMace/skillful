@@ -26,6 +26,7 @@ copilot plugin list
 |---|---|
 | **writing-skills** | Author reusable `SKILL.md` files that teach agents repeatable procedures and domain expertise. |
 | **bootstrap-skillful** | Set up a repository with Copilot CLI infrastructure, protected-branch defaults, and the core docs needed for agent workflows. |
+| **convert-documents-to-markdown** | Extract Markdown from PDFs and other document formats by installing and invoking Microsoft MarkItDown from the command line. |
 | **create-persona** | Construct research-writing personas by deeply studying a person's publications, flagship papers, venues, and stylistic patterns. |
 | **latex-report** | Produce LaTeX reports and PDF writeups with appropriate templates, modern fonts, and committed compiled PDFs. |
 | **related-work** | Find and evaluate academic and practitioner related work by dispatching parallel background researchers across orthogonal topic areas. |
@@ -56,6 +57,8 @@ skillful/
     ├── bootstrap-skillful/            # Bootstrap Copilot CLI repository scaffolding
     │   ├── SKILL.md
     │   └── templates/*
+    ├── convert-documents-to-markdown/ # Read PDFs and other docs via MarkItDown
+    │   └── SKILL.md
     ├── create-persona/                # Build repository research-writing personas
     │   └── SKILL.md
     ├── agent-design-patterns/         # Multi-agent coordination patterns
