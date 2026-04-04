@@ -16,7 +16,7 @@ For each test prompt, give it to a subagent working in this repository with the 
 **Prompt:** "Create a skill for debugging GitHub Actions CI failures. It should help agents diagnose why a workflow failed, find the relevant logs, and fix the issue."
 
 **Expected output characteristics:**
-- Directory: `.github/skills/github-actions-debugging/` (or similar kebab-case name)
+- Directory: `skills/github-actions-debugging/` (or similar kebab-case name)
 - Frontmatter: `name` matches directory, `description` is purpose-first, 1–3 sentences
 - Description: Leads with the capability ("Diagnose and fix failing GitHub Actions workflows…"), not "A skill for…" or "Guide for…"
 - Description: Includes trigger phrases ("Use when asked to debug, fix, or investigate CI/CD failures")
@@ -70,7 +70,7 @@ For each test prompt, give it to a subagent working in this repository with the 
 |-----------|------|------------|------|
 | Supporting files created | Both template and script exist | One of the two exists | Neither exists |
 | Files are referenced in SKILL.md | Clear references with relative paths and usage context | Referenced but not clearly explained | Not referenced |
-| Directory structure follows convention | Matches `.github/skills/<name>/` pattern with scripts/ and templates/ | Correct location but unusual structure | Wrong location or flat structure |
+| Directory structure follows convention | Matches `skills/<name>/` pattern with scripts/ and templates/ | Correct location but unusual structure | Wrong location or flat structure |
 | SKILL.md body is thin | Body focuses on procedure, references files for details | Body is slightly bloated but functional | Body embeds all content inline, ignoring supporting files |
 
 ---

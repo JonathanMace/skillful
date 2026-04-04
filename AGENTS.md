@@ -9,7 +9,7 @@ This repository provides general-purpose Copilot CLI skills and agents — packa
 | Directory | Purpose |
 |-----------|---------|
 | `.github/agents/` | Custom agent profiles (`.agent.md` files) |
-| `.github/skills/` | Reusable procedural knowledge (`SKILL.md` files) |
+| `skills/` | Plugin-distributable skills (`SKILL.md` files) |
 | `.github/instructions/` | Path-specific instruction files |
 | `.github/hooks/` | Event hooks for agent actions |
 | `.github/copilot-instructions.md` | Repository-wide instructions loaded in every session |

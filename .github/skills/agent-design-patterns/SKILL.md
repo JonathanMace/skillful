@@ -31,7 +31,7 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 
 **When to use**: Quality gates for documents, code, designs, or any artifact that benefits from diverse expert scrutiny.
 
-→ Read `.github/skills/agent-design-patterns/patterns/multi-reviewer-panel.md` for full implementation guidance.
+→ Read `skills/agent-design-patterns/patterns/multi-reviewer-panel.md` for full implementation guidance.
 
 ### Mentor Constellation with Referral Graph
 
@@ -41,7 +41,7 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 
 **When to use**: Advisory support where users need guidance from different domains but shouldn't have to know which specialist to ask.
 
-→ Read `.github/skills/agent-design-patterns/patterns/mentor-constellation.md` for full implementation guidance.
+→ Read `skills/agent-design-patterns/patterns/mentor-constellation.md` for full implementation guidance.
 
 ### Ritual Cadence
 
@@ -52,7 +52,7 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 
 **When to use**: Long-running autonomous sessions where agents accumulate stale state, unfinished work, or strategic drift.
 
-→ Read `.github/skills/agent-design-patterns/patterns/ritual-cadence.md` for full implementation guidance.
+→ Read `skills/agent-design-patterns/patterns/ritual-cadence.md` for full implementation guidance.
 
 ### Research Team
 
@@ -63,7 +63,7 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 
 **When to use**: Multi-step investigative, creative, or development projects where the work spans multiple domains, benefits from parallel specialist effort, and evolves as new questions emerge.
 
-→ Read `.github/skills/agent-design-patterns/patterns/research-team.md` for full implementation guidance.
+→ Read `skills/agent-design-patterns/patterns/research-team.md` for full implementation guidance.
 
 ### Escalation Ladder
 
@@ -75,7 +75,7 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 
 **When to use**: Tasks that vary in difficulty but where you don't know upfront which capability tier is needed, and using the most expensive agent for everything is wasteful.
 
-→ Read `.github/skills/agent-design-patterns/patterns/escalation-ladder.md` for full implementation guidance.
+→ Read `skills/agent-design-patterns/patterns/escalation-ladder.md` for full implementation guidance.
 
 ### Blackboard (Shared Scratchpad)
 
@@ -87,7 +87,7 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 
 **When to use**: Multi-agent collaboration on a single document or artifact where contributions span different domains and no single agent has the full picture, but a coordinator bottleneck is undesirable.
 
-→ Read `.github/skills/agent-design-patterns/patterns/blackboard.md` for full implementation guidance.
+→ Read `skills/agent-design-patterns/patterns/blackboard.md` for full implementation guidance.
 
 ### Compensating Workflow (Saga)
 
@@ -98,4 +98,4 @@ For the mechanics of authoring individual agents, see the `writing-custom-agents
 
 **When to use**: Multi-step agent workflows that modify external state — files, branches, API calls, bookings, registrations, notifications, procurement orders, deployments — where partial failure would leave the system in an inconsistent state requiring manual cleanup.
 
-→ Read `.github/skills/agent-design-patterns/patterns/compensating-workflow.md` for full implementation guidance.
+→ Read `skills/agent-design-patterns/patterns/compensating-workflow.md` for full implementation guidance.

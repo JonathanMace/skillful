@@ -25,7 +25,10 @@ copilot plugin list
 | Skill | What it does |
 |---|---|
 | **writing-skills** | Author reusable `SKILL.md` files that teach agents repeatable procedures and domain expertise. |
+| **create-persona** | Construct research-writing personas by deeply studying a person's publications, flagship papers, venues, and stylistic patterns. |
 | **latex-report** | Produce LaTeX reports and PDF writeups with appropriate templates, modern fonts, and committed compiled PDFs. |
+| **related-work** | Find and evaluate academic and practitioner related work by dispatching parallel background researchers across orthogonal topic areas. |
+| **review-document** | Produce critical second-pass document reviews by dispatching a fresh reviewer subagent with a task-specific identity. |
 | **writing-plugins** | Package reusable skills, agents, hooks, and integrations into an installable Copilot CLI plugin. |
 | **writing-custom-agents** | Author `.agent.md` profiles that give agents a focused role, model, and tool access — including orchestrating parallel subagents. |
 | **writing-custom-instructions** | Author instruction files that enforce coding standards and workflow rules across all Copilot sessions. |
@@ -49,12 +52,18 @@ Once installed, skills are automatically discovered by Copilot CLI. Ask the agen
 skillful/
 ├── plugin.json                        # Plugin manifest
 └── skills/
+    ├── create-persona/                # Build repository research-writing personas
+    │   └── SKILL.md
     ├── agent-design-patterns/         # Multi-agent coordination patterns
     │   ├── SKILL.md
     │   └── patterns/*.md
     ├── git-checkpoint/                # Conflict-free git workflow
     │   └── SKILL.md
     ├── latex-report/                  # Author LaTeX reports and PDF writeups
+    │   └── SKILL.md
+    ├── related-work/                  # Find and synthesise related work
+    │   └── SKILL.md
+    ├── review-document/               # Critically review completed documents
     │   └── SKILL.md
     ├── session-analysis/              # Session retrospective analysis
     │   ├── SKILL.md
@@ -73,4 +82,4 @@ skillful/
 
 ## Development
 
-Most reusable authoring skills have a canonical source in `.github/skills/`, and the `skills/` directory at the repo root is the plugin-distributable copy. Some skills are intentionally maintained only in `skills/` when they belong to the distributable plugin surface rather than the repository's mirrored internal skill set (for example, `bootstrap-skillful` and `writing-plugins`). When updating a mirrored skill, edit the `.github/skills/` version and copy it to `skills/`.
+Skills distributed by this plugin are authored directly in `skills/`. Validate them by installing the plugin with Copilot CLI from a local clone or GitHub and invoking the installed skills. Do not mirror plugin skills into `.github/skills/`.

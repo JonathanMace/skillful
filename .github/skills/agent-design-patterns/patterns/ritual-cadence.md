@@ -173,7 +173,7 @@ hour, take a 10-minute semester break.
 5. **Optional: Tasting note.** Write a brief creative note to mark the break.
 ```
 
-**As a skill (`.github/skills/semester-break/SKILL.md`):**
+**As a skill (`skills/semester-break/SKILL.md`):**
 
 ```markdown
 ---

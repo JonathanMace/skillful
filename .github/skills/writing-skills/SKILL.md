@@ -3,8 +3,8 @@ name: writing-skills
 description: >-
   Skills teach agents reusable procedures, workflows, and domain expertise
   they can invoke by name or that auto-activate from context.  Use this skill
-  to author a SKILL.md, package a repeatable workflow, or set up a
-  .github/skills directory.
+  to author a SKILL.md, package a repeatable workflow, or set up a Copilot
+  skill directory.
 license: MIT
 ---
 
@@ -17,9 +17,9 @@ A well-authored skill should let a future contributor repeat the same workflow w
 ## Procedure: Authoring a Skill
 
 1. **Decide whether a skill is the right mechanism** (see [When to Author a Skill](#when-to-author-a-skill-vs-other-customization) below).
-2. **Inspect neighboring skills first** — if the repository already has skills in `.github/skills/`, match their frontmatter shape, tone, and structural conventions for consistency.
+2. **Inspect neighboring skills first** — if the repository already has skills in `skills/`, `.github/skills/`, or another skill directory, match their frontmatter shape, tone, and structural conventions for consistency.
 3. **Define the trigger before authoring** — articulate the kind of request or task that should cause Copilot to load this skill. This becomes your `description` field and sets the scope boundary for the entire skill.
-4. **Choose a placement** — for Copilot CLI, prefer project-level (`.github/skills/`) or personal (`~/.copilot/skills/`).
+4. **Choose a placement** — use `skills/` when authoring a plugin-distributable skill, `.github/skills/` for repo-local skills, or `~/.copilot/skills/` for personal skills.
 5. **Create a directory** named in lowercase with hyphens (e.g., `github-actions-debugging`).
 6. **Author the `SKILL.md`** — author YAML frontmatter (`name`, `description`, optional `license`) followed by a Markdown body with instructions. Keep the body narrowly scoped to the trigger you defined in step 3. If the domain is broad, use the dispatcher pattern (see [Scaling Skills: The Dispatcher Pattern](#scaling-skills-the-dispatcher-pattern)) — keep the SKILL.md thin and point to deeper content files.
 7. **Add supporting files** (optional) — scripts, templates, or examples in the skill directory.
@@ -37,7 +37,7 @@ Skills are the right choice when you want "just-in-time" expertise without perma
 ## Directory Structure
 
 ```
-.github/skills/
+skills/
 └── my-skill-name/
     ├── SKILL.md              # Required — skill definition
     ├── scripts/              # Optional — helper scripts
@@ -50,10 +50,11 @@ Skills are the right choice when you want "just-in-time" expertise without perma
 
 | Scope | Location |
 |-------|----------|
+| **Plugin-distributed skills** | `skills/` in the plugin repository root |
 | **Project skills** (single repo) | `.github/skills/` in repo root |
 | **Personal skills** (all repos) | `~/.copilot/skills/` in your home directory |
 
-Copilot CLI can also read `.claude/skills/`, `.agents/skills/`, and their home-directory equivalents for compatibility. For Copilot-focused repositories, prefer `.github/skills/` and `~/.copilot/skills/`.
+Copilot CLI can also read `.claude/skills/`, `.agents/skills/`, and their home-directory equivalents for compatibility. For plugin repositories, use `skills/`; for repo-local customization, use `.github/skills/`; for personal scope, use `~/.copilot/skills/`.
 
 ### Naming Rules
 
@@ -187,7 +188,7 @@ Copilot auto-loads every skill's `description` into context on every LLM call to
 Keep the `SKILL.md` thin — just a purpose-first description and a short body that **points the agent to deeper content files**. The agent is intelligent enough to open and follow any file you reference. Only the description is always loaded; the body is loaded only on match; and the referenced files are loaded only when the agent reads them.
 
 ```
-.github/skills/
+skills/
 └── ci-workflows/
     ├── SKILL.md              # Thin dispatcher: description + routing logic
     └── guides/

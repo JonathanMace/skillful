@@ -44,7 +44,7 @@ Always keep the README up to date. When creating new reports, documents, or sign
 
 ## Repository Structure
 
-- `.github/skills/` — Agent skills, each in its own subdirectory with a `SKILL.md`
+- `skills/` — Plugin-distributable skills, each in its own subdirectory with a `SKILL.md`
 - `.github/agents/` — Custom agent profiles (`.agent.md` files) and their supporting subdirectories (e.g., embedded subagent instructions in `<agent>/members/`)
 - `.github/copilot-instructions.md` — This file; repo-wide instructions
 
@@ -53,6 +53,7 @@ Always keep the README up to date. When creating new reports, documents, or sign
 - Skills follow the official GitHub Copilot CLI SKILL.md format with YAML frontmatter (`name`, `description`, `license`)
 - Skill names are lowercase with hyphens, matching their directory name
 - All skills are self-contained and reference official GitHub documentation
+- Plugin-distributed skills in this repo live in `skills/` and are exercised via `copilot plugin install`; do not mirror them into `.github/skills/`
 - Skill descriptions must be **purpose-first**: the first sentence explains what the artifact achieves, not what the skill is. This ensures agents discover skills by intent even when they don't know the Copilot CLI term. See the `writing-skills` skill for full guidance.
 
 ## Concurrent Agents and Git Worktrees
@@ -83,4 +84,4 @@ At the start of each session, check if any maintenance tasks are due by reading 
 
 ## Anti-Patterns
 
-<!-- Add anti-patterns here as you discover them. Include brief context so future agents understand the rationale. -->
+- Do not mirror plugin skills into `.github/skills/` in this repository. The distributable source of truth is `skills/`, and skills should be exercised via plugin installation rather than duplicated as repo-local copies.

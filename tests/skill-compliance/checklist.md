@@ -1,6 +1,6 @@
 # Skill Compliance Checklist
 
-This is the authoritative checklist for evaluating skills in this repository. Every rule here is extracted from [`.github/skills/writing-skills/SKILL.md`](../../.github/skills/writing-skills/SKILL.md) and the repository's [`copilot-instructions.md`](../../.github/copilot-instructions.md).
+This is the authoritative checklist for evaluating skills in this repository. Every rule here is extracted from [`skills/writing-skills/SKILL.md`](../../skills/writing-skills/SKILL.md) and the repository's [`copilot-instructions.md`](../../.github/copilot-instructions.md).
 
 When auditing a skill, evaluate every item below. Mark each as **PASS**, **NEEDS WORK**, or **FAIL**.
 
