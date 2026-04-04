@@ -2,7 +2,7 @@
 name: convert-documents-to-markdown
 description: >-
   Extract Markdown from PDFs and other document formats by installing and
-  invoking Microsoft MarkItDown from the command line. Use when an agent needs
+  invoking Microsoft MarkItDown from the command line.  Use when an agent needs
   to read a PDF, Word document, PowerPoint, spreadsheet, HTML file, EPUB, or
   similar source by converting it into Markdown first.
 license: MIT
@@ -10,65 +10,51 @@ license: MIT
 
 # Converting Documents to Markdown with MarkItDown
 
-This skill explains how to read non-Markdown documents by converting them into Markdown first with [Microsoft MarkItDown](https://github.com/microsoft/markitdown). MarkItDown is a Python utility that converts formats such as PDF, Word, PowerPoint, Excel, HTML, EPUB, CSV, JSON, XML, ZIP archives, and more into Markdown that agents can inspect and reason about more effectively.
-
-For final critique of the extracted or rewritten Markdown, see `review-document`. For authoring reusable skills like this one, see `writing-skills`.
+Read non-Markdown documents by converting them to Markdown with [Microsoft MarkItDown](https://github.com/microsoft/markitdown). MarkItDown is a Python CLI that converts PDF, Word, PowerPoint, Excel, HTML, EPUB, CSV, JSON, XML, ZIP archives, and more into Markdown that agents can inspect and reason about directly.
 
 ## Procedure
 
-1. **Inspect First** — identify the input file type, whether you only need PDF support or broader document coverage, and whether the environment already has MarkItDown installed.
-2. **Check whether MarkItDown is available** — run:
+1. **Inspect First** — identify the input file type, whether you need only PDF support or broader document coverage, and whether the environment already has MarkItDown installed:
 
    ```powershell
    python -m pip show markitdown
    ```
 
-   If it is already installed, continue. If not, install it in the current environment.
-3. **Install the right dependency set** — prefer the smallest extra set that covers the needed formats:
+2. **Install the right dependency set** — if MarkItDown is missing or the installed extras do not cover the needed format, install the smallest extra set that does. Text-based formats (HTML, CSV, JSON, XML) work with a base `pip install markitdown`; binary formats need extras:
+
+   | Format | Install command |
+   |--------|----------------|
+   | HTML, CSV, JSON, XML | `pip install markitdown` (base) |
+   | PDF | `pip install "markitdown[pdf]"` |
+   | Word (.docx) | `pip install "markitdown[docx]"` |
+   | PowerPoint (.pptx) | `pip install "markitdown[pptx]"` |
+   | Excel (.xlsx) | `pip install "markitdown[xlsx]"` |
+   | Multiple formats | `pip install "markitdown[pdf,docx,pptx]"` |
+   | Everything | `pip install "markitdown[all]"` |
+
+   Prefer the narrow install. Use `markitdown[all]` only when the workflow clearly needs multiple format families.
+
+3. **Convert the file to Markdown** — always invoke via `python -m markitdown` (the bare `markitdown` console script may not be on `PATH`, especially on Windows):
 
    ```powershell
-   # PDF only
-   python -m pip install "markitdown[pdf]"
+   # Write to stdout
+   python -m markitdown document.pdf > document.md
 
-   # Broad document support
-   python -m pip install "markitdown[all]"
+   # Write directly to a file
+   python -m markitdown document.pdf -o document.md
    ```
 
-   `markitdown[all]` is the safest default when the agent may need to handle multiple document types in one workflow.
-4. **Prefer `python -m markitdown` on Windows** — the `markitdown` console script may not be on `PATH` even when the package is installed. `python -m markitdown` avoids that issue and was verified in this environment.
-5. **Convert the file to Markdown** — the two primary invocation patterns are:
+   The same pattern works for `.docx`, `.pptx`, `.xlsx`, `.html`, `.epub`, `.csv`, `.json`, `.xml`, and other supported types.
+
+4. **Read the extracted Markdown, not the binary source** — once conversion succeeds, inspect the generated `.md` file with normal file-reading tools. This is the point where the agent effectively "reads" the document.
+
+5. **Spot-check extraction quality** — verify that the Markdown contains the expected headings, paragraphs, lists, and tables. If the output is truncated or unexpectedly sparse, keep the original file and note the limitation explicitly.
+
+6. **Use format hints for ambiguous files** — if the filename or extension is unclear, pass hints to the CLI:
 
    ```powershell
-   # Write Markdown to stdout
-   python -m markitdown C:\path\to\document.pdf > C:\path\to\document.md
-
-   # Or write directly to a file
-   python -m markitdown C:\path\to\document.pdf -o C:\path\to\document.md
+   python -m markitdown --help   # shows -x (extension), -m (MIME type), -c (charset)
    ```
-
-   The same pattern works for other supported files such as `.docx`, `.pptx`, `.xlsx`, `.html`, `.epub`, `.csv`, `.json`, and `.xml`.
-6. **Read the extracted Markdown rather than the binary source** — once conversion succeeds, inspect the generated `.md` file with the normal file-reading tools. This is the point where the agent effectively "reads the PDF" or other document.
-7. **Spot-check extraction quality** — verify that the Markdown contains the expected headings, paragraphs, lists, and tables. If the output is truncated, malformed, or unexpectedly sparse, keep the original file around and note the extraction limitation explicitly.
-8. **Use format hints only when needed** — if the filename or extension is ambiguous, consult the tested CLI help:
-
-   ```powershell
-   python -m markitdown --help
-   ```
-
-   The CLI supports hints such as `-x` (extension), `-m` (MIME type), and `-c` (charset) for edge cases where the file type is not obvious.
-9. **Escalate to broader dependencies only when necessary** — if PDF conversion works but another format fails, install the needed extra (or `markitdown[all]`) rather than assuming the base install supports every format.
-
-## Tested Commands
-
-These command patterns were verified in this environment:
-
-```powershell
-python -m pip install "markitdown[pdf]"
-python -m markitdown C:\path\to\sample.pdf > C:\path\to\sample.md
-python -m markitdown C:\path\to\sample.pdf -o C:\path\to\sample.md
-```
-
-In this Windows environment, `python -m markitdown` worked, while the bare `markitdown` executable was not available on `PATH`.
 
 ## Common Use Cases
 
@@ -80,26 +66,26 @@ In this Windows environment, `python -m markitdown` worked, while the bare `mark
 | **Spreadsheet** | `python -m markitdown data.xlsx -o data.md` |
 | **HTML** | `python -m markitdown page.html -o page.md` |
 
-## Notes and Caveats
-
-- MarkItDown focuses on useful Markdown extraction for LLMs and analysis pipelines, not pixel-perfect document reproduction.
-- Optional dependencies are organized by feature group. A successful base install does **not** guarantee that every format is enabled.
-- Some PDFs may emit warnings about metadata or extraction permissions while still converting successfully.
-- If you see unrelated warnings about tools such as `ffmpeg`, do not assume PDF conversion failed; inspect the Markdown output itself.
-
 ## Rules and Constraints
 
-- Do **not** try to parse PDF bytes manually when MarkItDown is available.
-- Do **not** assume the `markitdown` executable is callable directly on Windows.
+- Do **not** parse binary document bytes manually when MarkItDown is available.
+- Do **not** assume the bare `markitdown` executable is on `PATH`; use `python -m markitdown`.
 - Do **not** cite a document as "read" until the Markdown extraction has succeeded and the output has been inspected.
 - Do **not** silently ignore poor extraction quality; record limitations when conversion is lossy or incomplete.
-- Do **not** install `markitdown[all]` by reflex if only a narrow format set is needed, unless the workflow clearly benefits from broad support.
+- Do **not** install `markitdown[all]` by reflex if only a narrow format set is needed.
+- MarkItDown focuses on useful extraction for LLMs, not pixel-perfect reproduction. Expect best-effort fidelity.
+- Optional dependencies are organized by feature group — a base install does **not** guarantee every format.
+- Warnings about unrelated tools (e.g., `ffmpeg`) do not mean conversion failed; always inspect the output.
+
+## Cross-References
+
+- Use `review-document` for critical review of extracted or rewritten Markdown after conversion
+- Use `writing-skills` if the task is to package document-conversion guidance as a reusable skill rather than convert a document
 
 ## Done Criteria
 
-- The file type and required coverage were identified up front
-- MarkItDown availability was checked
-- Missing dependencies were installed with the appropriate extras
-- The document was converted to Markdown with a tested CLI command
-- The generated Markdown was inspected instead of the raw binary file
-- Extraction quality or limitations were noted when relevant
+- Input file type and required format coverage identified up front
+- MarkItDown availability checked; missing extras installed
+- Document converted to Markdown via `python -m markitdown`
+- Generated Markdown inspected instead of the raw binary file
+- Extraction quality or limitations noted when relevant
