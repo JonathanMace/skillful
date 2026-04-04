@@ -19,6 +19,7 @@ Read each `SKILL.md` file listed below:
 | Skill | Path |
 |-------|------|
 | git-checkpoint | `.github/skills/git-checkpoint/SKILL.md` |
+| latex-report | `skills/latex-report/SKILL.md` |
 | session-analysis | `.github/skills/session-analysis/SKILL.md` |
 | writing-plugins | `skills/writing-plugins/SKILL.md` |
 | writing-custom-agents | `.github/skills/writing-custom-agents/SKILL.md` |

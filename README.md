@@ -25,6 +25,7 @@ copilot plugin list
 | Skill | What it does |
 |---|---|
 | **writing-skills** | Author reusable `SKILL.md` files that teach agents repeatable procedures and domain expertise. |
+| **latex-report** | Produce LaTeX reports and PDF writeups with appropriate templates, modern fonts, and committed compiled PDFs. |
 | **writing-plugins** | Package reusable skills, agents, hooks, and integrations into an installable Copilot CLI plugin. |
 | **writing-custom-agents** | Author `.agent.md` profiles that give agents a focused role, model, and tool access — including orchestrating parallel subagents. |
 | **writing-custom-instructions** | Author instruction files that enforce coding standards and workflow rules across all Copilot sessions. |
@@ -52,6 +53,8 @@ skillful/
     │   ├── SKILL.md
     │   └── patterns/*.md
     ├── git-checkpoint/                # Conflict-free git workflow
+    │   └── SKILL.md
+    ├── latex-report/                  # Author LaTeX reports and PDF writeups
     │   └── SKILL.md
     ├── session-analysis/              # Session retrospective analysis
     │   ├── SKILL.md
