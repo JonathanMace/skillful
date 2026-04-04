@@ -60,7 +60,9 @@ skillful/
     ├── convert-documents-to-markdown/ # Read PDFs and other docs via MarkItDown
     │   └── SKILL.md
     ├── create-persona/                # Build repository research-writing personas
-    │   └── SKILL.md
+    │   ├── SKILL.md
+    │   ├── guides/*.md
+    │   └── templates/*.md
     ├── agent-design-patterns/         # Multi-agent coordination patterns
     │   ├── SKILL.md
     │   └── patterns/*.md
